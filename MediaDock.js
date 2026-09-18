@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         MediaDock - Local YouTube Downloader
 // @namespace    http://tampermonkey.net/
-// @version      3.0
-// @description  一键调用本地 yt-dlp 下载 YouTube 视频，并显示所有页共享的多任务进度列表 (MediaDock Stage-003)
+// @version      4.0
+// @description  一键调用本地 yt-dlp 下载 YouTube 视频，并显示所有页共享的多任务进度列表 (MediaDock Stage-004)
 // @match        https://www.youtube.com/watch*
 // @match        https://www.youtube.com/shorts/*
 // @grant        GM_xmlhttpRequest
@@ -22,6 +22,13 @@
     // 已完成任务展开后的渲染上限，超出时明确提示而不是静默吞掉
     const MAX_COMPLETED_ROWS = 100;
     const SHORT_TITLE = 20;
+    // 控制接口路径 (Stage-004)：与服务端 POST 路由一一对应
+    const CONTROL_PATHS = {
+        pause: '/pause',
+        resume: '/resume',
+        cancel: '/cancel',
+        retry: '/retry'
+    };
     // URL 归一化 (借鉴多合一脚本 cleanUrl)
     function cleanYouTubeUrl(raw) {
         try {
@@ -164,7 +171,7 @@
         document.body.appendChild(panel);
         return panel;
     }
-    // 本阶段不渲染暂停/继续/取消/删除/重试，只显示状态
+    // 状态文案 + 行内控制按钮 (Stage-004)：按钮只由服务端状态决定
     function rowTextFor(task) {
         const title = shortTitle(task.title || task.url || '');
         if (task.status === 'downloading') {
@@ -175,6 +182,8 @@
             return text;
         }
         if (task.status === 'pending') return '🕒 ' + title + ' · 排队中';
+        if (task.status === 'paused') return '⏸ ' + title + ' · 已暂停';
+        if (task.status === 'cancelled') return '🚫 ' + title + ' · 已取消';
         if (task.status === 'completed') return '✅ ' + title + ' · 完成';
         if (task.status === 'error') {
             const code = task.error_code ? ' (' + task.error_code + ')' : '';
@@ -182,17 +191,74 @@
         }
         return '• ' + title + ' · ' + String(task.status || '');
     }
+    function controlsFor(status) {
+        if (status === 'downloading') {
+            return [{ action: 'pause', label: '暂停' },
+                    { action: 'cancel', label: '取消' }];
+        }
+        if (status === 'paused') {
+            return [{ action: 'resume', label: '继续' },
+                    { action: 'cancel', label: '取消' }];
+        }
+        if (status === 'pending') {
+            return [{ action: 'cancel', label: '取消' }];
+        }
+        if (status === 'error' || status === 'cancelled') {
+            return [{ action: 'retry', label: '重试' }];
+        }
+        return [];
+    }
+    function makeControlButton(taskId, spec) {
+        const btn = document.createElement('button');
+        btn.textContent = spec.label;
+        btn.setAttribute('data-control', spec.action);
+        Object.assign(btn.style, {
+            minWidth: '42px',
+            padding: '2px 7px',
+            fontSize: '11px',
+            color: '#ffffff',
+            background: spec.action === 'cancel' ? '#b3261e' : '#37474f',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer'
+        });
+        btn.addEventListener('click', function (event) {
+            event.stopPropagation();
+            postControl(spec.action, taskId);
+        });
+        return btn;
+    }
     function makeRow(task) {
         const row = document.createElement('div');
-        // 稳定标识：刷新时按 task_id 更新，不会把标题/进度绑到别的任务
+        // 稳定标识：刷新时按 task_id 更新，不会把标题/进度/按钮绑到别的任务
         row.setAttribute('data-task-id', task.task_id);
         Object.assign(row.style, {
             minHeight: (ROW_HEIGHT - 10) + 'px',
             padding: '5px 6px',
             borderBottom: '1px solid rgba(255,255,255,0.08)',
-            wordBreak: 'break-word'
+            wordBreak: 'break-word',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            gap: '6px'
         });
-        row.textContent = rowTextFor(task);
+        const label = document.createElement('span');
+        label.textContent = rowTextFor(task);
+        label.style.flex = '1 1 auto';
+        row.appendChild(label);
+        const specs = controlsFor(task.status);
+        if (specs.length > 0) {
+            const box = document.createElement('span');
+            Object.assign(box.style, {
+                flex: '0 0 auto',
+                display: 'flex',
+                gap: '4px'
+            });
+            specs.forEach(function (spec) {
+                box.appendChild(makeControlButton(task.task_id, spec));
+            });
+            row.appendChild(box);
+        }
         return row;
     }
     function makeCompletedToggle(count) {
@@ -257,6 +323,38 @@
         ensurePanel();
         summaryEl.textContent = '服务未启动（127.0.0.1:8765）';
         if (submitting) setButton('❌ 本地服务未启动', '#d32f2f');
+    }
+    // =========================
+    // 控制请求 (Stage-004)：POST 后立即刷新，按钮状态始终来自服务端
+    // =========================
+    function postControl(action, taskId) {
+        const path = CONTROL_PATHS[action];
+        if (!path || !taskId) return;
+        GM_xmlhttpRequest({
+            method: 'POST',
+            url: SERVER + path,
+            headers: { 'Content-Type': 'application/json' },
+            data: JSON.stringify({ task_id: taskId }),
+            timeout: 15000,
+            onload: function (response) {
+                if (response.status !== 200) {
+                    let code = '';
+                    try {
+                        code = JSON.parse(response.responseText).error_code || '';
+                    } catch (e) { code = ''; }
+                    console.warn('[MediaDock] 控制失败:', action, taskId, code);
+                    if (summaryEl) {
+                        summaryEl.textContent = '控制失败' +
+                            (code ? ' ' + code : '');
+                    }
+                }
+                refreshTasks();
+            },
+            onerror: function () {
+                console.error('[MediaDock] 无法连接本地服务:', SERVER);
+                setServerOffline();
+            }
+        });
     }
     // =========================
     // 轮询共享任务列表 (单一计时器，所有页面同一数据源)

@@ -12,7 +12,17 @@ from typing import Any, Dict
 import uuid
 
 
-TASK_STATUSES = ("pending", "downloading", "completed", "error")
+TASK_STATUSES = ("pending", "downloading", "paused", "completed",
+                 "cancelled", "error")
+
+# Stage-004: statuses that no longer occupy an active download slot and are
+# not expected to change without an explicit control call.
+TERMINAL_STATUSES = ("completed", "error")
+SETTLED_STATUSES = ("completed", "error", "paused", "cancelled")
+
+# Stage-004: statuses whose stored `percent` is not live progress. They take
+# part in unfinished ordering as 0% (plan-whole.md 6.2).
+NO_LIVE_PROGRESS_STATUSES = ("pending", "paused", "error", "cancelled")
 
 # Stage-001 carried these fields in every task dict. They must keep
 # working through the Stage-002 migration.

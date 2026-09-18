@@ -1,0 +1,29 @@
+ M MediaDock.js
+ M core_engine.py
+ M core_listing.py
+ M core_manager.py
+ M core_parse.py
+ M core_scheduler.py
+ M core_task.py
+ M plan-whole.md
+ M server.py
+ M tests/check_userscript.py
+ M tests/helpers.py
+ M tests/probe_chain_result.json
+ M tests/probe_multi_result.json
+ M tests/test_engine.py
+ M tests/test_listing.py
+ M tests/test_manager.py
+ M tests/test_scheduler.py
+ M tests/unittest_result.txt
+ M tests/userscript_check.txt
+?? Stage-004.md
+?? core_control.py
+?? core_files.py
+?? docs/stage004-migration.md
+?? tests/_commit_log.txt
+?? tests/probe_control.py
+?? tests/probe_control_result.json
+?? tests/test_control.py
+?? tests/test_control_api.py
+?? tests/test_files.py

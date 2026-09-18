@@ -14,6 +14,9 @@ Ordering contract (Stage-003.md 5.4 / plan-whole.md Stage-003 task 5):
    same-second ties
 5. `task_id` is the final stable tie-breaker
 
+Stage-004: `paused`/`cancelled` carry no live progress, so they take part in
+unfinished ordering as 0% (plan-whole.md 6.2) even if `percent` is stored.
+
 Sorts are applied least-significant key first, which keeps every Python
 stable sort deterministic without extra comparison helpers.
 """
@@ -22,6 +25,7 @@ from __future__ import annotations
 from typing import Any, Dict, Iterable, List
 
 COMPLETED = "completed"
+LIVE_PROGRESS_STATUSES = ("downloading",)
 
 
 def _percent(task: Dict[str, Any]) -> float:
@@ -29,6 +33,13 @@ def _percent(task: Dict[str, Any]) -> float:
         return float(task.get("percent") or 0.0)
     except (TypeError, ValueError):
         return 0.0
+
+
+def _progress(task: Dict[str, Any]) -> float:
+    """Only a downloading task contributes live progress to the ordering."""
+    if task.get("status") not in LIVE_PROGRESS_STATUSES:
+        return 0.0
+    return _percent(task)
 
 
 def _completion_order(task: Dict[str, Any]) -> int:
@@ -56,7 +67,7 @@ def sort_tasks(tasks: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
             unfinished.append(raw)
     unfinished.sort(key=lambda t: _text(t, "task_id"))
     unfinished.sort(key=lambda t: _text(t, "created_at"), reverse=True)
-    unfinished.sort(key=lambda t: _percent(t), reverse=True)
+    unfinished.sort(key=_progress, reverse=True)
     finished.sort(key=lambda t: _text(t, "task_id"))
     finished.sort(key=lambda t: _completion_order(t), reverse=True)
     finished.sort(key=lambda t: _text(t, "completed_at"), reverse=True)

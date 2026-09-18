@@ -17,7 +17,7 @@
 - 计划名称：MediaDock Local Media Platform
 - 计划文件：`plan-whole.md`
 - 当前版本：`0.2`
-- 当前状态：Stage-003 已完成，Stage-004 未开始
+- 当前状态：Stage-004 已完成，Stage-005 未开始
 - 计划负责人：[待填写]
 - 最后更新时间：2026-09-19
 - 当前阻塞：需要在进入高影响阶段前确认相关决策门禁
@@ -362,7 +362,7 @@ stateDiagram-v2
 | Stage-001 | 基线确认与 MVP 稳定化 | 让现有 YouTube 单任务流程可重复验证 | 测试基线、配置约束、MVP 验收结果 | 无 | 2026-09-19 |
 | Stage-002 | Task 核心模型与后端边界 | 固化 Task 模型、状态和模块责任 | Task 模型、状态转换、后端模块边界 | Stage-001 | 2026-09-19 |
 | Stage-003 | 多任务调度 | 支持多个独立下载任务 | 多任务 Task Manager、任务列表 API/UI | Stage-002 | 2026-09-19 |
-| Stage-004 | 暂停、继续、取消与断点 | 完成进程控制和恢复 | 控制 API、状态控制、断点测试 | Stage-003 | - |
+| Stage-004 | 暂停、继续、取消与断点 | 完成进程控制和恢复 | 控制 API、状态控制、断点测试 | Stage-003 | 2026-09-19 |
 | Stage-005 | 持久化与任务历史 | 服务重启后保留任务记录 | SQLite、迁移、历史查询 | Stage-004 | - |
 | Stage-006 | 配置、依赖与安全加固 | 提升可配置性和本地安全 | `config.json`、依赖检查、安全测试 | Stage-001，建议 Stage-005 后完善 | - |
 | Stage-007 | 平台 Adapter | 在不污染核心的情况下扩展平台 | Adapter 接口、YouTube Adapter、扩展预留 | Stage-002、Stage-006 | - |
@@ -708,7 +708,7 @@ flowchart TB
 | D-005 | MVP 默认格式保持 `height<=1080` 的 MP4 策略 | 已确认 | Stage-001、Stage-008 |
 | D-006 | 任务以独立 Task 表示，不使用单一全局下载状态 | 已确认 | 全部 |
 | D-007 | 暂不引入 SQLite 到 MVP | 已确认 | Stage-001 至 Stage-004 |
-| D-008 | 暂停实现优先采用 yt-dlp 可恢复的终止/重启方案 | 建议确认 | Stage-004 |
+| D-008 | 暂停实现优先采用 yt-dlp 可恢复的终止/重启方案 | 已确认（Stage-004 采用 terminates + 保留 `.part` + 重启复用） | Stage-004 |
 | D-009 | 下载中的任务删除时停止进程并删除关联临时文件和输出文件；暂停/继续保留断点所需临时文件 | 已确认 | Stage-004、Stage-006 |
 | D-010 | 是否长期兼容 GET `/download`，并何时增加 POST 创建任务 | 待确认 | Stage-001、Stage-002 |
 | D-011 | 多任务最多 3 个并发，超出任务进入 pending 队列 | 已确认 | Stage-003 |
@@ -736,6 +736,8 @@ flowchart TB
 | 编号 | 变更内容 | 原因 | 影响阶段 | 影响等级 | 处理决定 | 计划版本 |
 | --- | --- | --- | --- | --- | --- | --- |
 | C-001 | [待填写] | [原因] | [Stage] | 高/低 | [新增/回溯/局部调整/拒绝] | [版本] |
+| C-002 | Stage-004 新增 `paused`/`cancelled` 状态与 `POST /pause`、`/resume`、`/cancel`、`/retry`；`error`/`cancelled` 可重试；取消时删除本次运行的临时与输出文件 | 落实 D-008/D-009，并在提供控制 API 前先扩展状态机 | Stage-004（下游 Stage-005/006） | 低（Task 字段未新增，GET API 形状不变） | 局部调整，已写入 Stage-004.md 与 `docs/stage004-migration.md` | 0.2 |
+| C-003 | 终态任务记录删除接口（`POST /delete`）不在 Stage-004 实现，Stage-004 由 `cancel` 承担「停止进程 + 删除文件」职责 | 避免在历史模型确定前引入第二个删除语义 | Stage-004、Stage-005 | 低 | 记录并推迟到 Stage-005 | 0.2 |
 
 高影响变更必须在继续开发前更新 `plan-whole.md` 和受影响的 Stage 文件。低影响变更可以在 Stage 文件中记录，但不能改变总体契约而不升级版本。
 

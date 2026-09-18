@@ -1,0 +1,58 @@
+{
+  "base": "http://127.0.0.1:59861",
+  "bind": "127.0.0.1",
+  "engine_stub": "scripted process (spawn replaced)",
+  "download_dir": "E:\\GitHub\\MediaDock\\downloads",
+  "runs": {
+    "PROBECTRL01": [
+      {
+        "run": 1,
+        "part_existed_before_start": false
+      },
+      {
+        "run": 2,
+        "part_existed_before_start": true
+      }
+    ],
+    "PROBECTRL02": [
+      {
+        "run": 1,
+        "part_existed_before_start": false
+      }
+    ],
+    "PROBECTRL03": [
+      {
+        "run": 1,
+        "part_existed_before_start": false
+      }
+    ],
+    "PROBECTRL04": [
+      {
+        "run": 1,
+        "part_existed_before_start": false
+      }
+    ],
+    "PROBECTRL05": [
+      {
+        "run": 1,
+        "part_existed_before_start": false
+      }
+    ]
+  },
+  "paused_task": "45f3a687",
+  "pause_kept_breakpoint": true,
+  "resume_reused_breakpoint": true,
+  "cancel_cleaned_files": true,
+  "isolation": {
+    "paused": "02c7d2d7",
+    "untouched": "31384573"
+  },
+  "queued_cancel": {
+    "queued_task": "589bb40a"
+  },
+  "scheduler": {
+    "active_count": 3,
+    "active_limit": 3,
+    "queued_count": 0
+  }
+}

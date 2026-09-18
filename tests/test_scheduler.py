@@ -26,7 +26,7 @@ class FakeEngine:
     def __init__(self, harness):
         self.h = harness
 
-    def run(self, task_id, url):
+    def run(self, task_id, url, control=None):
         h = self.h
         h.calls.append((task_id, url))
         h.max_active = max(h.max_active, h.scheduler.active_count())
@@ -179,7 +179,7 @@ class TestRefillAndFailure(unittest.TestCase):
 
     def test_engine_without_terminal_status_is_not_faked(self):
         class SilentEngine:
-            def run(self, task_id, url):
+            def run(self, task_id, url, control=None):
                 return None
 
         manager = TaskManager()

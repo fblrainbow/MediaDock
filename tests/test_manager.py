@@ -84,5 +84,93 @@ class TestTransitions(unittest.TestCase):
         json.dumps(m.get(t.task_id).to_dict())
 
 
+class TestStage004Transitions(unittest.TestCase):
+    """T401-T405: paused / cancelled / retry state machine."""
+
+    def test_pause_resume_complete(self):
+        m = TaskManager()
+        task = m.create("https://example.com/v")
+        m.transition(task.task_id, "downloading")
+        m.transition(task.task_id, "paused")
+        paused = m.get(task.task_id)
+        self.assertEqual(paused.status, "paused")
+        self.assertEqual(paused.error_code, "")
+        self.assertTrue(paused.started_at)
+        m.transition(task.task_id, "downloading")
+        m.transition(task.task_id, "completed", percent=100.0)
+        done = m.get(task.task_id)
+        self.assertEqual(done.status, "completed")
+        self.assertEqual(done.percent, 100.0)
+
+    def test_cancel_from_every_live_state(self):
+        m = TaskManager()
+        pending = m.create("https://example.com/a")
+        m.transition(pending.task_id, "cancelled")
+        self.assertEqual(m.get(pending.task_id).status, "cancelled")
+
+        running = m.create("https://example.com/b")
+        m.transition(running.task_id, "downloading")
+        m.transition(running.task_id, "cancelled")
+        self.assertEqual(m.get(running.task_id).status, "cancelled")
+
+        paused = m.create("https://example.com/c")
+        m.transition(paused.task_id, "downloading")
+        m.transition(paused.task_id, "paused")
+        m.transition(paused.task_id, "cancelled")
+        self.assertEqual(m.get(paused.task_id).status, "cancelled")
+
+    def test_retry_resets_fields(self):
+        m = TaskManager()
+        task = m.create("https://example.com/v")
+        m.transition(task.task_id, "downloading", percent=42.0)
+        m.transition(task.task_id, "error", error_code="exit_code",
+                     error_message="boom")
+        self.assertIsNotNone(m.get(task.task_id).completed_at)
+        m.transition(task.task_id, "pending", percent=0.0, speed="", eta="",
+                     error_code="", error_message="", completed_at="",
+                     completion_order=None)
+        retried = m.get(task.task_id)
+        self.assertEqual(retried.status, "pending")
+        self.assertEqual(retried.percent, 0.0)
+        self.assertEqual(retried.error_code, "")
+        self.assertEqual(retried.error_message, "")
+        self.assertEqual(retried.completed_at, "")
+        self.assertIsNone(retried.completion_order)
+
+    def test_retry_from_cancelled(self):
+        m = TaskManager()
+        task = m.create("https://example.com/v")
+        m.transition(task.task_id, "downloading")
+        m.transition(task.task_id, "cancelled")
+        m.transition(task.task_id, "pending")
+        self.assertEqual(m.get(task.task_id).status, "pending")
+
+    def test_cancelled_does_not_take_a_completion_slot(self):
+        m = TaskManager()
+        first = m.create("https://example.com/a")
+        m.transition(first.task_id, "downloading")
+        m.transition(first.task_id, "cancelled")
+        second = m.create("https://example.com/b")
+        m.transition(second.task_id, "downloading")
+        m.transition(second.task_id, "completed")
+        self.assertEqual(m.get(second.task_id).completion_order, 1)
+
+    def test_completed_stays_terminal(self):
+        m = TaskManager()
+        task = m.create("https://example.com/v")
+        m.transition(task.task_id, "downloading")
+        m.transition(task.task_id, "completed")
+        for target in ("downloading", "paused", "cancelled", "error",
+                       "pending"):
+            with self.assertRaises(IllegalTransition):
+                m.transition(task.task_id, target)
+
+    def test_unknown_status_is_rejected(self):
+        m = TaskManager()
+        task = m.create("https://example.com/v")
+        with self.assertRaises(IllegalTransition):
+            m.transition(task.task_id, "downloaded")
+
+
 if __name__ == "__main__":
     unittest.main()

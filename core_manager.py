@@ -1,20 +1,39 @@
-"""MediaDock TaskStore/TaskManager boundary (Stage-002).
+"""MediaDock TaskStore/TaskManager boundary (Stage-002, extended Stage-004).
 
 Thread-safe in-memory store. Handler and DownloadEngine must go through
 TaskManager; nothing else writes task state.
+
+Stage-004 extends the state machine with `paused` and `cancelled` plus the
+retry transition back to `pending`. `completed` stays terminal.
 """
 from __future__ import annotations
 
 import threading
 from typing import Any, Callable, Dict, List, Optional
 
-from core_task import Task, _now_iso, new_task_id, task_from_dict
+from core_task import TASK_STATUSES, Task, _now_iso, new_task_id, task_from_dict
 
 _ALLOWED = {
-    "pending": ("downloading", "error"),
-    "downloading": ("downloading", "completed", "error"),
+    "pending": ("downloading", "cancelled", "error"),
+    "downloading": ("downloading", "paused", "completed", "cancelled",
+                    "error"),
+    "paused": ("downloading", "cancelled", "error"),
     "completed": (),
-    "error": (),
+    "error": ("pending", "downloading"),
+    "cancelled": ("pending", "downloading"),
+}
+
+# Fields a retry must clear so the Task looks like a fresh run. Kept here so
+# every retry path resets exactly the same set.
+RETRY_RESET_FIELDS: Dict[str, Any] = {
+    "percent": 0.0,
+    "speed": "",
+    "eta": "",
+    "file_path": "",
+    "error_code": "",
+    "error_message": "",
+    "completed_at": "",
+    "completion_order": None,
 }
 
 
@@ -28,6 +47,8 @@ class IllegalTransition(Exception):
 
 
 def _check_transition(task_id: str, from_status: str, to_status: str) -> None:
+    if to_status not in TASK_STATUSES:
+        raise IllegalTransition(task_id, from_status, to_status)
     if to_status not in _ALLOWED.get(from_status, ()):
         raise IllegalTransition(task_id, from_status, to_status)
 

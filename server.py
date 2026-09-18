@@ -1,11 +1,13 @@
 import atexit
 import json
 import os
+import re
 import sys
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
+from core_control import ControlError
 from core_engine import DownloadEngine
 from core_listing import build_task_list
 from core_manager import TaskManager
@@ -74,7 +76,41 @@ def _make_engine():
 
 
 scheduler = Scheduler(manager, _make_engine, max_active=MAX_ACTIVE_TASKS,
-                      logger=log)
+                      logger=log, download_dir=DOWNLOAD_DIR)
+
+# =========================
+# 控制接口 (Stage-004)：POST /pause /resume /cancel /retry
+# =========================
+CONTROL_ROUTES = {
+    "/pause": "pause",
+    "/resume": "resume",
+    "/cancel": "cancel",
+    "/retry": "retry",
+}
+
+# task_id 只允许 uuid4()[:8] 这类安全字符，避免任何拼接/注入面
+TASK_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,64}$")
+
+
+def control_action(path, task_id):
+    """Run a scheduler control action; returns (body, http_code)."""
+    method_name = CONTROL_ROUTES.get(path)
+    if method_name is None:
+        return _error("not_found", "Not Found", 404)
+    if not task_id:
+        return _error("missing_task_id", "Missing task_id", 400)
+    if not TASK_ID_RE.match(str(task_id)):
+        return _error("invalid_task_id",
+                      "task_id must be 1-64 chars of [A-Za-z0-9_-]", 400,
+                      task_id)
+    try:
+        result = getattr(scheduler, method_name)(str(task_id))
+        return result, 200
+    except ControlError as exc:
+        return _error(exc.code, exc.message, exc.http_status, exc.task_id)
+    except Exception as exc:  # noqa: BLE001 - never leak a traceback to HTTP
+        log(f"control {method_name} failed for {task_id}: {exc}")
+        return _error("control_failed", str(exc), 500, task_id)
 
 
 def _get(task_id):
@@ -212,10 +248,35 @@ class Handler(BaseHTTPRequestHandler):
         body, code = _error("not_found", "Not Found", 404)
         self._json(body, code=code)
 
+    def do_POST(self):
+        """控制接口 (Stage-004)：JSON body {"task_id": "..."}。"""
+        parsed = urlparse(self.path)
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+        except (TypeError, ValueError):
+            length = 0
+        raw = self.rfile.read(length) if length > 0 else b""
+        if not raw:
+            body, code = _error("bad_request", "Expected a JSON object body", 400)
+            self._json(body, code=code)
+            return
+        try:
+            payload = json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, ValueError):
+            body, code = _error("bad_request", "Body is not valid JSON", 400)
+            self._json(body, code=code)
+            return
+        if not isinstance(payload, dict):
+            body, code = _error("bad_request", "Body must be a JSON object", 400)
+            self._json(body, code=code)
+            return
+        body, code = control_action(parsed.path, payload.get("task_id"))
+        self._json(body, code=code)
+
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "*")
         self.end_headers()
 

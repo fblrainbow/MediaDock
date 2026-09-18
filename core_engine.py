@@ -1,7 +1,11 @@
-"""MediaDock DownloadEngine boundary (Stage-002).
+"""MediaDock DownloadEngine boundary (Stage-002, extended Stage-004).
 
 Builds the yt-dlp command (Stage-001 policy frozen) and runs it in a
 subprocess, reporting parse events to a TaskManager. Never touches HTTP.
+
+Stage-004: the engine receives the TaskControl for its task, attaches the
+process handle, records artifact paths and turns a pause/cancel intent into
+`paused`/`cancelled` plus the matching file policy.
 """
 from __future__ import annotations
 
@@ -11,6 +15,8 @@ import sys
 from dataclasses import dataclass
 from typing import Callable, List, Optional
 
+from core_control import TaskControl, terminate_tree
+from core_files import cleanup_task_files, started_epoch
 from core_parse import ProgressEvent, parse_line
 
 FORMAT_EXPR = "bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080][ext=mp4]"
@@ -66,11 +72,18 @@ class DownloadEngine:
         self._popen_factory = popen_factory or subprocess.Popen
         self._log = logger or (lambda *a: None)
 
-    def run(self, task_id: str, url: str) -> EngineResult:
+    def run(self, task_id: str, url: str,
+            control: Optional[TaskControl] = None) -> EngineResult:
+        if control is None:
+            control = TaskControl(task_id, self._log)
         try:
             self.manager.transition(task_id, "downloading")
         except Exception as e:
             return EngineResult(task_id, -1, "start_failed", str(e))
+        if control.cancel_requested():
+            return self._finish_cancelled(task_id, control)
+        if control.pause_requested():
+            return self._finish_paused(task_id)
         command = build_command(self.ytdlp, self.download_dir, url)
         self._log(f"Task {task_id} start: {url}")
         self._log(f"yt-dlp: {self.ytdlp}")
@@ -81,24 +94,19 @@ class DownloadEngine:
                 kwargs["creationflags"] = getattr(subprocess,
                                                   "CREATE_NO_WINDOW", 0)
             process = self._popen_factory(command, **kwargs)
+            control.attach_process(process)
             for raw in process.stdout:
+                if control.cancel_requested() or control.pause_requested():
+                    terminate_tree(process, self._log)
+                    break
                 line = (raw or "").strip()
                 if not line:
                     continue
                 self._log(f"[{task_id}] {line}")
                 event = parse_line(line)
-                self._apply(task_id, event)
+                self._apply(task_id, event, control)
             process.wait()
-            if process.returncode == 0:
-                self.manager.transition(task_id, "completed", percent=100.0,
-                                        speed="", eta="")
-                self._log(f"Task {task_id} completed")
-                return EngineResult(task_id, 0)
-            self.manager.transition(task_id, "error", error_code="exit_code",
-                                    error_message=f"returncode={process.returncode}")
-            self._log(f"Task {task_id} failed: returncode={process.returncode}")
-            return EngineResult(task_id, process.returncode, "exit_code",
-                                f"returncode={process.returncode}")
+            return self._finish_outcome(task_id, process, control)
         except FileNotFoundError:
             self.manager.transition(task_id, "error", error_code="ytdlp_missing",
                                     error_message=f"yt-dlp not found at {self.ytdlp}")
@@ -106,6 +114,10 @@ class DownloadEngine:
             return EngineResult(task_id, -1, "ytdlp_missing",
                                 f"yt-dlp not found at {self.ytdlp}")
         except Exception as e:  # noqa: BLE001 - engine must not fake success
+            if control.cancel_requested():
+                return self._finish_cancelled(task_id, control)
+            if control.pause_requested():
+                return self._finish_paused(task_id)
             try:
                 self.manager.transition(task_id, "error", error_code="engine_error",
                                         error_message=str(e))
@@ -113,12 +125,77 @@ class DownloadEngine:
                 pass
             self._log(f"Task {task_id} error: {e}")
             return EngineResult(task_id, -1, "engine_error", str(e))
+        finally:
+            control.detach_process()
 
-    def _apply(self, task_id: str, event: ProgressEvent) -> None:
+    def _finish_outcome(self, task_id: str, process,
+                        control: TaskControl) -> EngineResult:
+        """Cancel beats pause beats return code: never fake a success."""
+        if control.cancel_requested():
+            return self._finish_cancelled(task_id, control)
+        if control.pause_requested():
+            return self._finish_paused(task_id)
+        if process.returncode == 0:
+            self.manager.transition(task_id, "completed", percent=100.0,
+                                    speed="", eta="")
+            self._log(f"Task {task_id} completed")
+            return EngineResult(task_id, 0)
+        self.manager.transition(task_id, "error", error_code="exit_code",
+                                error_message=f"returncode={process.returncode}")
+        self._log(f"Task {task_id} failed: returncode={process.returncode}")
+        return EngineResult(task_id, process.returncode, "exit_code",
+                            f"returncode={process.returncode}")
+
+    def _finish_paused(self, task_id: str) -> EngineResult:
+        try:
+            self.manager.transition(task_id, "paused")
+        except Exception as exc:  # noqa: BLE001 - diagnostics only
+            self._log(f"Task {task_id} could not be marked paused: {exc}")
+        self._log(f"Task {task_id} paused (breakpoint files kept)")
+        return EngineResult(task_id, -1, "paused")
+
+    def _finish_cancelled(self, task_id: str,
+                          control: TaskControl) -> EngineResult:
+        try:
+            self.manager.transition(task_id, "cancelled")
+        except Exception as exc:  # noqa: BLE001 - diagnostics only
+            self._log(f"Task {task_id} could not be marked cancelled: {exc}")
+        deleted = self.cleanup(task_id, control)
+        self._log(f"Task {task_id} cancelled (removed {len(deleted)} file(s))")
+        return EngineResult(task_id, -1, "cancelled", f"removed={len(deleted)}")
+
+    def cleanup(self, task_id: str, control: TaskControl) -> List[str]:
+        """Delete this run's temp/output files (D-009). Never raises.
+
+        Without a `started_at` we cannot tell this run's files apart from an
+        older download of the same video, so cleanup is skipped on purpose.
+        """
+        task = self.manager.get(task_id)
+        url = task.url if task else ""
+        since = started_epoch(task.started_at) if task else 0.0
+        if since <= 0.0:
+            self._log(f"Task {task_id} cleanup skipped: no started_at")
+            return []
+        try:
+            return cleanup_task_files(self.download_dir, url,
+                                      control.artifacts(), since, self._log)
+        except Exception as exc:  # noqa: BLE001 - cleanup must not break state
+            self._log(f"Task {task_id} cleanup error: {exc}")
+            return []
+
+    def _apply(self, task_id: str, event: ProgressEvent,
+               control: TaskControl) -> None:
         if event.kind == "progress" and event.percent is not None:
             self.manager.report_progress(task_id, event.percent,
                                          event.speed, event.eta)
         elif event.kind == "merging":
             self.manager.report_merging(task_id)
+        elif event.kind == "merged":
+            # 合并行同时代表进度(99%)与本次输出路径
+            self.manager.report_merging(task_id)
+            if event.path:
+                control.record_artifacts(event.path)
+        elif event.kind == "destination" and event.path:
+            control.record_artifacts(event.path)
         elif event.kind == "title" and event.title:
             self.manager.report_title(task_id, event.title)

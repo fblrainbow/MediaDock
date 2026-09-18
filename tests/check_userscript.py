@@ -6,8 +6,8 @@ This script covers what a hand-edit can realistically break:
 
   * brace/paren/bracket balance, ignoring comments and string literals
   * no template literals (backticks) sneaking in
-  * the Stage-003 contract anchors still exist
-  * no leftover single-task state or unimplemented control verbs
+  * the Stage-003/004 contract anchors still exist
+  * control requests use POST + JSON and render from server state only
 
 Usage (project venv):
   C:\\Users\\Administrator\\Envs\\mediadock\\Scripts\\python.exe tests\\check_userscript.py
@@ -81,10 +81,15 @@ def main():
         raise SystemExit(f"FAIL: unclosed {stack}")
 
     required = [
-        "@version      3.0",
+        "@version      4.0",
         "'/tasks'",
         "'/download?url='",
+        "'/pause'",
+        "'/resume'",
+        "'/cancel'",
+        "'/retry'",
         "data-task-id",
+        "data-control",
         "MAX_VISIBLE_ROWS = 20",
         "mediadock-completed-toggle",
         "yt-navigate-finish",
@@ -92,6 +97,12 @@ def main():
         "已加入任务列表",
         "排队中",
         "合并中",
+        "暂停",
+        "继续",
+        "取消",
+        "重试",
+        "已暂停",
+        "已取消",
     ]
     missing = [needle for needle in required if needle not in src]
     if missing:
@@ -103,10 +114,15 @@ def main():
     present = [needle for needle in forbidden if needle in no_comments]
     if present:
         raise SystemExit(f"FAIL: forbidden leftovers in code {present}")
-    control = ["取消", "暂停", "重试", "删除"]
-    bad_control = [word for word in control if word in no_comments]
-    if bad_control:
-        raise SystemExit(f"FAIL: unimplemented control verbs {bad_control}")
+
+    # Stage-004：控制请求必须走 POST + JSON，而不是 GET 查询串
+    if "method: 'POST'" not in no_comments:
+        raise SystemExit("FAIL: control requests must use POST")
+    if "JSON.stringify({ task_id: taskId })" not in no_comments:
+        raise SystemExit("FAIL: control body must be {task_id}")
+    # 按钮可见性必须由服务端 status 推导，不能出现本地状态机
+    if "function controlsFor(status)" not in no_comments:
+        raise SystemExit("FAIL: controlsFor(status) must exist")
 
     print(f"JS STRUCTURE OK ({len(src.splitlines())} lines, "
           f"{len(code)} code chars, no backticks, anchors present)")

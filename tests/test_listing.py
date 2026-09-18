@@ -42,6 +42,16 @@ class TestSorting(unittest.TestCase):
         self.assertEqual([t["task_id"] for t in sort_tasks(tasks)],
                          ["d", "e", "p"])
 
+    def test_paused_and_cancelled_sort_as_zero_progress(self):
+        # Stage-004: 暂停/取消没有实时进度，即使存有 percent 也按 0% 参与排序
+        tasks = [task("paused-high", "paused", 90.0,
+                      created_at="2026-09-19T00:00:01"),
+                 task("live-low", "downloading", 1.0),
+                 task("cancelled", "cancelled", 50.0,
+                      created_at="2026-09-19T00:00:02")]
+        self.assertEqual([t["task_id"] for t in sort_tasks(tasks)],
+                         ["live-low", "cancelled", "paused-high"])
+
     def test_completed_sorted_by_completed_at_desc(self):
         tasks = [task("old", "completed", 100.0,
                       completed_at="2026-09-19T00:00:01"),
@@ -85,7 +95,7 @@ class GatedEngine:
         self._gate = gate
         self._manager = manager
 
-    def run(self, task_id, url):
+    def run(self, task_id, url, control=None):
         self._manager.transition(task_id, "downloading")
         self._gate.wait(10)
         self._manager.transition(task_id, "completed", percent=100.0)
