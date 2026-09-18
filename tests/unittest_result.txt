@@ -1,0 +1,30 @@
+returncode=0
+STDOUT:
+[2026-09-19 01:48:27] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
+[2026-09-19 01:48:27] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
+[2026-09-19 01:48:27] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 01:48:27] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+[2026-09-19 01:48:28] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
+
+STDERR:
+test_download_invalid_url_400 (test_api.TestLiveApi.test_download_invalid_url_400) ... ok
+test_download_missing_url_400 (test_api.TestLiveApi.test_download_missing_url_400) ... ok
+test_health (test_api.TestLiveApi.test_health) ... ok
+test_status_all_is_dict (test_api.TestLiveApi.test_status_all_is_dict) ... ok
+test_status_missing_task_404 (test_api.TestLiveApi.test_status_missing_task_404) ... ok
+test_get_missing_returns_none (test_api.TestTaskMemoryModel.test_get_missing_returns_none) ... ok
+test_task_ids_unique (test_api.TestTaskMemoryModel.test_task_ids_unique) ... ok
+test_update_get_all_roundtrip (test_api.TestTaskMemoryModel.test_update_get_all_roundtrip) ... ok
+test_http_ok (test_api.TestUrlValidation.test_http_ok) ... ok
+test_missing_url_invalid (test_api.TestUrlValidation.test_missing_url_invalid) ... ok
+test_non_http_invalid (test_api.TestUrlValidation.test_non_http_invalid) ... ok
+test_destination_line_ignored (test_baseline.TestProgressParsing.test_destination_line_ignored) ... ok
+test_hls_style_progress_lines (test_baseline.TestProgressParsing.test_hls_style_progress_lines) ... ok
+test_merger_line_detected (test_baseline.TestProgressParsing.test_merger_line_detected) ... ok
+test_normal_progress_line (test_baseline.TestProgressParsing.test_normal_progress_line) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.579s
+
+OK
+

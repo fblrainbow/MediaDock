@@ -1,0 +1,13 @@
+returncode=0
+STDOUT:
+[2026-09-19 01:48:28] Task 037b9032 start: https://www.youtube.com/watch?v=BASELINE-PROBE
+[2026-09-19 01:48:28] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DBASELINE-PROBE HTTP/1.1" 200 -
+[2026-09-19 01:48:28] yt-dlp: C:\Users\ADMINI~1\AppData\Local\Temp\mediadock-fake-ytdlp-81cpiuyu\yt-dlp.bat
+[2026-09-19 01:48:28] Task 037b9032 failed: returncode=1
+[2026-09-19 01:48:28] HTTP 127.0.0.1 "GET /status?id=037b9032 HTTP/1.1" 200 -
+[2026-09-19 01:48:28] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+CHAIN PROBE OK task_id=037b9032 status=error
+wrote E:\GitHub\MediaDock\tests\probe_chain_result.json
+
+STDERR:
+
