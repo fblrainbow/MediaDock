@@ -1,0 +1,67 @@
+"""Shared stdlib-only test helpers for MediaDock.
+
+Keeps `srv.scheduler`'s engine factory swappable so unit tests never spawn
+a real yt-dlp process or touch the network (Stage-003.md 7.3). Every
+helper uses the global server module, because the HTTP handler, scheduler
+and manager under test are the real singletons.
+"""
+import time
+
+import server as srv
+
+TERMINAL_STATUSES = ("completed", "error")
+
+
+class InstantEngine:
+    """Engine stub that finishes a Task immediately (no real yt-dlp)."""
+
+    def run(self, task_id, url):
+        srv.manager.transition(task_id, "downloading")
+        srv.manager.transition(task_id, "completed", percent=100.0)
+
+
+class FailingEngine:
+    """Engine stub that fails a Task immediately (no real yt-dlp)."""
+
+    def __init__(self, error_code="exit_code", message="stubbed failure"):
+        self._code = error_code
+        self._message = message
+
+    def run(self, task_id, url):
+        srv.manager.transition(task_id, "downloading")
+        srv.manager.transition(task_id, "error", error_code=self._code,
+                               error_message=self._message)
+
+
+def install_engine(engine_cls):
+    """Replace the scheduler's engine factory. Returns the previous one."""
+    old = srv.scheduler._engine_factory
+    srv.scheduler.set_engine_factory(lambda: engine_cls())
+    return old
+
+
+def restore_engine(old):
+    """Put back a factory returned by `install_engine`."""
+    srv.scheduler.set_engine_factory(old)
+
+
+def wait_terminal(task_id, timeout=15.0):
+    """Wait until a Task reaches a terminal status (or disappears)."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        task = srv.manager.get(task_id)
+        if task is None or task.status in TERMINAL_STATUSES:
+            return True
+        time.sleep(0.02)
+    return False
+
+
+def drop_when_terminal(task_id, timeout=15.0):
+    """Test cleanup: never remove a Task while its engine still runs."""
+    wait_terminal(task_id, timeout)
+    srv.manager.drop(task_id)
+
+
+def wait_idle(timeout=20.0):
+    """Wait until the scheduler has no active task and an empty queue."""
+    return srv.scheduler.wait_idle(timeout)

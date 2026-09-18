@@ -1,14 +1,16 @@
+import atexit
 import json
 import os
 import sys
-import threading
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
 from core_engine import DownloadEngine
+from core_listing import build_task_list
 from core_manager import TaskManager
 from core_parse import MERGE_RE, PROGRESS_RE
+from core_scheduler import MAX_ACTIVE_TASKS, Scheduler
 from core_task import Task
 
 # =========================
@@ -16,6 +18,8 @@ from core_task import Task
 # =========================
 LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "MediaDock-server.log")
 _log_fp = open(LOG_FILE, "a", encoding="utf-8", buffering=1)
+# 进程退出时关闭日志句柄，避免 unittest 报 ResourceWarning
+atexit.register(lambda: _log_fp.close())
 
 
 def log(*args):
@@ -59,6 +63,18 @@ YT_DLP = resolve_ytdlp()
 manager = TaskManager()
 tasks = manager._tasks
 tasks_lock = manager._lock
+
+# =========================
+# Scheduler (Stage-003: 活动槽位 + FIFO 等待队列的唯一决策点)
+# =========================
+def _make_engine():
+    """每次运行构造一个引擎；yt-dlp 路径延迟读取，便于测试/探针替换。"""
+    return DownloadEngine(manager, ytdlp=YT_DLP, download_dir=DOWNLOAD_DIR,
+                          logger=log)
+
+
+scheduler = Scheduler(manager, _make_engine, max_active=MAX_ACTIVE_TASKS,
+                      logger=log)
 
 
 def _get(task_id):
@@ -116,11 +132,14 @@ def _sync_legacy_view(task_id, full):
 
 
 def download_video(task_id, url):
-    created = manager.get_or_create(task_id, url)
-    engine = DownloadEngine(manager, ytdlp=YT_DLP,
-                            download_dir=DOWNLOAD_DIR, logger=log)
-    # 保持旧线程入口签名；pending->downloading 由引擎统一转换
-    engine.run(task_id, url)
+    """Stage-002 兼容入口：把已存在的 Task 交给调度器。
+
+    Stage-002 中它是线程体（同步跑完一次下载）；Stage-003 起 HTTP 入口统一
+    走 `scheduler.submit()`，这里保留为显式适配入口，同样受活动上限和
+    FIFO 队列约束。返回 True 表示已进入活动集合，False 表示已排队。
+    """
+    manager.get_or_create(task_id, url)
+    return scheduler.admit(task_id, url)
 
 
 def _error(code, message, http_code, task_id=None):
@@ -153,6 +172,10 @@ class Handler(BaseHTTPRequestHandler):
         if parsed.path == "/health":
             self._json({"status": "ok"})
             return
+        # 共享任务列表：全量任务（契约排序）+ 调度器计数 (Stage-003)
+        if parsed.path == "/tasks":
+            self._json(build_task_list(manager, scheduler))
+            return
         # 查询下载进度：/status 全量 / /status?id=xxx 单任务 (plan.md #9)
         if parsed.path == "/status":
             params = parse_qs(parsed.query)
@@ -181,16 +204,9 @@ class Handler(BaseHTTPRequestHandler):
                                     "URL must use http or https", 400)
                 self._json(body, code=code)
                 return
-            # 先创建 pending Task，再启动线程（避免查询竞态）
-            created = manager.create(url)
-            task_id = created.task_id
-            thread = threading.Thread(
-                target=download_video,
-                args=(task_id, url),
-                daemon=True,
-            )
-            thread.start()
-            self._json({"task_id": task_id})
+            # 创建 pending Task 后交给调度器：有空闲槽位就启动，否则 FIFO 排队
+            created = scheduler.submit(url)
+            self._json({"task_id": created["task_id"]})
             return
         # 其他路径
         body, code = _error("not_found", "Not Found", 404)
@@ -204,12 +220,33 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
 
+class MediaDockServer(ThreadingHTTPServer):
+    """单实例本地服务。
+
+    `HTTPServer` 默认 `allow_reuse_address = True`，实测在 Windows 上会让
+    第二个进程也成功绑定同一 127.0.0.1:8765（socket 实验：持有一方设置
+    SO_REUSEADDR 后，默认配置的 HTTPServer 能再次绑定成功）。两个进程各有
+    一份内存任务表，前端会看到任务"时有时无"。这里关掉端口复用：端口被
+    占用时以 rc=2 退出并写明确日志。
+    """
+
+    allow_reuse_address = False
+
+
 def main():
-    server = ThreadingHTTPServer(("127.0.0.1", 8765), Handler)
+    try:
+        server = MediaDockServer(("127.0.0.1", 8765), Handler)
+    except OSError as exc:
+        log(f"ERROR: cannot bind 127.0.0.1:8765 ({exc})")
+        log("另一个 MediaDock 实例可能已在运行；请先结束它再启动。")
+        log("提示：Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" "
+            "| Where-Object { $_.CommandLine -like '*server.py*' }")
+        sys.exit(2)
     log("MediaDock server started")
     log("http://127.0.0.1:8765")
     log(f"downloads: {DOWNLOAD_DIR}")
     log(f"yt-dlp: {YT_DLP}")
+    log(f"max active downloads: {scheduler.active_limit}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

@@ -1,12 +1,19 @@
 """Stage-001 live-chain probe (stdlib only, no new deps).
 
 Starts a real server.Handler on 127.0.0.1:<ephemeral port> and creates
-one task with a fake yt-dlp executable that exits nonzero immediately.
-This validates the observable failure path without real YouTube access:
+one task whose yt-dlp is a fake executable that exits nonzero. This
+validates the observable failure path with a real process spawn:
 
   GET /download?url=https://... -> 200 {task_id}
-  GET /status?id=...            -> error after fake process exits
+  GET /status?id=...            -> error (error_code=exit_code)
   GET /status                   -> contains the task
+
+Known limitation (recorded in Stage-003.md as a difference): the fake
+tool has to be a `.bat` on Windows, and cmd.exe re-parses the frozen
+`-f bv*[height<=1080]...` argument as a redirection, so the fake never
+prints a progress line. Progress parsing on the live chain is therefore
+covered by tests\\probe_multi.py instead; this probe only proves the
+spawn -> nonzero exit -> Task error chain.
 
 Usage (project venv):
   C:\\Users\\Administrator\\Envs\\mediadock\\Scripts\\python.exe tests\\probe_chain.py
@@ -30,8 +37,12 @@ import server as srv
 def make_fake_ytdlp():
     tmp = tempfile.mkdtemp(prefix="mediadock-fake-ytdlp-")
     if os.name == "nt":
+        # .bat 内容实际不会执行：命令行里 -f 表达式含 "<"，cmd.exe 会把它
+        # 当重定向，进程直接以 rc=1 结束——正是本探针要验证的失败链路。
+        # 真正的进度解析链路由 tests\probe_multi.py 覆盖。
         path = os.path.join(tmp, "yt-dlp.bat")
-        with open(path, "w", encoding="utf-8") as f:
+        # newline="" 防止 Python 把已写入的 \r\n 再翻译成 \r\r\n
+        with open(path, "w", encoding="utf-8", newline="") as f:
             f.write("@echo [download]   1.0% of ~ 1.00MiB "
                     "at 1.00KiB/s ETA 00:01\r\n")
             f.write("@echo simulated failure output\r\n")
@@ -79,6 +90,7 @@ def main():
                 break
         assert final is not None, "no status observed"
         assert final.get("status") == "error", final
+        assert final.get("error_code") == "exit_code", final
         c3, b3 = http_get(base, "/status")
         assert c3 == 200, (c3, b3)
         assert task_id in json.loads(b3), b3[:500]

@@ -7,11 +7,15 @@ import urllib.error
 from http.server import ThreadingHTTPServer
 
 import server as srv
+from tests.helpers import (InstantEngine, drop_when_terminal, install_engine,
+                           restore_engine)
 
 
 class TestLiveApiV2(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        # Stage-003: 单元测试不启动真实 yt-dlp，也不依赖网络
+        cls._old_factory = install_engine(InstantEngine)
         cls.httpd = ThreadingHTTPServer(("127.0.0.1", 0), srv.Handler)
         cls.port = cls.httpd.server_address[1]
         cls.thread = threading.Thread(target=cls.httpd.serve_forever,
@@ -23,6 +27,7 @@ class TestLiveApiV2(unittest.TestCase):
     def tearDownClass(cls):
         cls.httpd.shutdown()
         cls.httpd.server_close()
+        restore_engine(cls._old_factory)
 
     def _get(self, path):
         try:
@@ -73,7 +78,7 @@ class TestLiveApiV2(unittest.TestCase):
                          "title", "created_at", "updated_at"):
                 self.assertIn(name, data, name)
         finally:
-            srv.manager.drop(tid)
+            drop_when_terminal(tid)
 
     def test_unknown_path_json(self):
         code, data = self._json("/nope")
