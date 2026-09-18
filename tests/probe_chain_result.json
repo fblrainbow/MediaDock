@@ -1,17 +1,26 @@
 {
-  "base": "http://127.0.0.1:50271",
-  "task_id": "037b9032",
+  "base": "http://127.0.0.1:53616",
+  "task_id": "5488a0da",
   "final": {
+    "task_id": "5488a0da",
+    "type": "download",
     "status": "error",
+    "url": "https://www.youtube.com/watch?v=BASELINE-PROBE",
+    "platform": "youtube",
+    "title": "",
     "percent": 0.0,
     "speed": "",
     "eta": "",
-    "url": "https://www.youtube.com/watch?v=BASELINE-PROBE",
-    "title": "",
-    "created_at": "2026-09-19T01:48:28",
-    "updated_at": "2026-09-19T01:48:28"
+    "file_path": "",
+    "error_code": "exit_code",
+    "error_message": "returncode=1",
+    "created_at": "2026-09-19T02:34:56",
+    "started_at": "2026-09-19T02:34:56",
+    "updated_at": "2026-09-19T02:34:56",
+    "completed_at": "2026-09-19T02:34:56",
+    "completion_order": null
   },
-  "fake_ytdlp": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-fake-ytdlp-81cpiuyu\\yt-dlp.bat",
+  "fake_ytdlp": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-fake-ytdlp-8eyp7vv8\\yt-dlp.bat",
   "port_mode": "ephemeral",
   "bind": "127.0.0.1"
 }

@@ -1,8 +1,8 @@
 # Stage-001 基线快照（2026-09-19）
 
 > 对应 `Stage-001.md` 任务 001 / 任务 007 输出。
-> 方法：静态读码 + `tests/` 自动化基线 + 假 yt-dlp 链路探针。
-> 未执行真实 YouTube 下载（T011/T012 未执行）。
+> 方法：静态读码 + `tests/` 自动化基线 + 假 yt-dlp 链路探针 + 2026-09-19 用户真实下载验证。
+> 真实链路结论：T011/T012/T014 通过（用户实测可下载、符合预期）；T013 以假探针为据通过；T016 以重启回归为据通过；仅 T015（SPA 导航）未单独验证，遗留 Stage-003。
 
 ## 1. 环境（任务 002）
 - Python 3.13.15（venv `C:\Users\Administrator\Envs\mediadock\Scripts\python.exe`）
@@ -53,10 +53,11 @@
 3. 前端单 `currentTaskId`；Stage-003 必须重做任务列表。
 4. 无暂停/继续/取消/删除/重试 API；无 SQLite；无多平台；无动态格式。
 5. 错误体文本/JSON 不统一（`/download` 400 为文本）。
-6. 真实下载 T011/T012 未执行：只做到失败路径可观测，成功路径仍需后续真实验证。
+6. 真实下载 T011/T012 已于 2026-09-19 由用户实测通过；T015（SPA 导航）未单独验证，遗留 Stage-003（任务列表重做时一并验证）。
 
 ## 6. 测试证据
 - `tests/unittest_result.txt`：15/15 通过（T001/T003-T010 对应项）。
 - `tests/probe_chain_run.txt` + `tests/probe_chain_result.json`：假 yt-dlp 使任务进入 error，全量包含该任务。
-- 未执行：T011/T012 真实下载；T014-T016 手工/重启回归（只记录行为）。
+- 通过：T011/T012（2026-09-19 用户真实下载）、T013（假 yt-dlp 失败探针）、T014（用户真实下载按钮链路）、T016（venv 重启后任务清空且可重建）。
+- 未执行：T015（SPA 导航），遗留 Stage-003。
 - 命令（venv `C:\Users\Administrator\Envs\mediadock\Scripts\python.exe`）：`python -m unittest discover -s tests -v`；`python tests/probe_chain.py`

@@ -17,14 +17,19 @@ def is_valid_download_url(url):
 
 
 class TestTaskMemoryModel(unittest.TestCase):
-    def test_update_get_all_roundtrip(self):
+    def test_legacy_compat_update_roundtrip(self):
+        # Stage-002 keeps Stage-001's server._update/_get/_all working until
+        # the migration below finishes; terminal states are frozen by the
+        # new state machine.
         import uuid
+        from core_task import Task
         tid = "t-" + str(uuid.uuid4())[:8]
         with srv.tasks_lock:
-            srv.tasks[tid] = {"status": "downloading", "percent": 0.0,
-                              "speed": "", "eta": "",
-                              "created_at": "2026-09-19T00:00:00",
-                              "updated_at": "2026-09-19T00:00:00"}
+            srv.tasks[tid] = Task(task_id=tid, status="downloading",
+                                  url="https://example.com/v").to_dict()
+            srv.tasks[tid].update({"percent": 0.0, "speed": "", "eta": "",
+                                   "created_at": "2026-09-19T00:00:00",
+                                   "updated_at": "2026-09-19T00:00:00"})
         try:
             srv._update(tid, percent=8.8, speed="22.68KiB/s", eta="47:53")
             t = srv._get(tid)
@@ -35,9 +40,12 @@ class TestTaskMemoryModel(unittest.TestCase):
             self.assertNotEqual(srv._get(tid)["percent"], 999)
             srv._update(tid, status="completed", percent=100.0,
                         speed="", eta="")
-            self.assertEqual(srv._get(tid)["status"], "completed")
+            done = srv._get(tid)
+            self.assertEqual(done["status"], "completed")
+            self.assertEqual(done["percent"], 100.0)
+            # completed is terminal: further transitions are refused
             srv._update(tid, status="error")
-            self.assertEqual(srv._get(tid)["status"], "error")
+            self.assertEqual(srv._get(tid)["status"], "completed")
             json.dumps(srv._get(tid), ensure_ascii=False)
         finally:
             with srv.tasks_lock:
@@ -99,16 +107,22 @@ class TestLiveApi(unittest.TestCase):
         self.assertIsInstance(json.loads(body.decode("utf-8")), dict)
 
     def test_status_missing_task_404(self):
-        code, _ = self._get("/status?id=no-such-task-id-xyz")
+        code, body404 = self._get("/status?id=no-such-task-id-xyz")
         self.assertEqual(code, 404)
+        self.assertEqual(json.loads(body404.decode("utf-8"))["error_code"],
+                         "task_not_found")
 
     def test_download_missing_url_400(self):
-        code, _ = self._get("/download")
+        code, miss_body = self._get("/download")
         self.assertEqual(code, 400)
+        self.assertEqual(json.loads(miss_body.decode("utf-8"))["error_code"],
+                         "missing_url")
 
     def test_download_invalid_url_400(self):
-        code, _ = self._get("/download?url=ftp%3A%2F%2Fexample.com%2Fx")
+        code, bad_body = self._get("/download?url=ftp%3A%2F%2Fexample.com%2Fx")
         self.assertEqual(code, 400)
+        self.assertEqual(json.loads(bad_body.decode("utf-8"))["error_code"],
+                         "invalid_url")
 
 
 if __name__ == "__main__":

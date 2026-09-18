@@ -1,13 +1,15 @@
 import json
-import re
-import subprocess
+import os
 import sys
 import threading
-import uuid
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
-import os
+
+from core_engine import DownloadEngine
+from core_manager import TaskManager
+from core_parse import MERGE_RE, PROGRESS_RE
+from core_task import Task
 
 # =========================
 # 日志：同时写文件 + 保留控制台（pythonw 下控制台为空也不报错）
@@ -30,7 +32,7 @@ def log(*args):
 
 
 # =========================
-# 配置
+# 配置（Stage-002：值与 Stage-001 一致，来源收敛到 core_engine）
 # =========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
@@ -45,129 +47,89 @@ _CANDIDATES = [
 
 
 def resolve_ytdlp():
-    for c in _CANDIDATES:
-        if os.path.isabs(c):
-            if os.path.isfile(c):
-                return c
-        else:
-            # PATH 中查找
-            for p in os.environ.get("PATH", "").split(os.pathsep):
-                full = os.path.join(p.strip('"'), c)
-                if os.path.isfile(full):
-                    return full
-    return _CANDIDATES[0]
+    from core_engine import resolve_ytdlp as _resolve
+    return _resolve()
 
 
 YT_DLP = resolve_ytdlp()
 
 # =========================
-# Task Manager (MVP: 内存 dict + 锁)
+# Task Manager (Stage-002: 唯一状态写入口)
 # =========================
-tasks = {}
-tasks_lock = threading.Lock()
-
-
-def _update(task_id, **fields):
-    with tasks_lock:
-        t = tasks.get(task_id)
-        if t is None:
-            return
-        t.update(fields)
-        t["updated_at"] = datetime.now().isoformat(timespec="seconds")
+manager = TaskManager()
+tasks = manager._tasks
+tasks_lock = manager._lock
 
 
 def _get(task_id):
-    with tasks_lock:
-        t = tasks.get(task_id)
-        return dict(t) if t else None
+    t = manager.get(task_id)
+    return t.to_dict() if t else None
 
 
 def _all():
-    with tasks_lock:
-        return {k: dict(v) for k, v in tasks.items()}
+    return manager.all()
 
-PROGRESS_RE = re.compile(
-    r"\[download\]\s+(\d+(?:\.\d+)?)%\s+of\s+.*?at\s+(.+?)\s+ETA\s+(.+)"
-)
-MERGE_RE = re.compile(r"\[Merger\]|Merging formats", re.IGNORECASE)
+
+def _update(task_id, **fields):
+    status = fields.pop("status", None)
+    # 兼容旧直接调用：download_video(task_id, url) 先建 pending 再转态
+    if manager.get(task_id) is None:
+        url = fields.pop("url", "")
+        manager.get_or_create(task_id, url)
+        if not status:
+            status = "downloading"
+    if status is not None:
+        try:
+            updated = manager.transition(task_id, status, **fields)
+        except Exception:
+            # pending->downloading->completed/error 之外的一律拒绝写脏状态
+            return
+        _sync_legacy_view(task_id, updated.to_dict())
+        return
+    t = manager.get(task_id)
+    if t is None:
+        return
+    if t.status != "downloading":
+        return
+    if "title" in fields and len(fields) == 1:
+        manager.report_title(task_id, fields["title"])
+    elif "percent" in fields:
+        manager.report_progress(task_id, fields.get("percent", t.percent),
+                                fields.get("speed", t.speed),
+                                fields.get("eta", t.eta))
+    elif set(fields) == {"speed"} and fields.get("speed") == "merging":
+        manager.report_merging(task_id)
+    _sync_legacy_view(task_id, manager.get(task_id).to_dict())
+
+
+def _sync_legacy_view(task_id, full):
+    """让旧读码/调试仍能从 manager._tasks 看到 Stage-001 字段。"""
+    with tasks_lock:
+        legacy = tasks.get(task_id)
+        if isinstance(legacy, Task):
+            return
+        if isinstance(legacy, dict):
+            for key in ("status", "percent", "speed", "eta", "url", "title",
+                        "created_at", "updated_at"):
+                if key in full:
+                    legacy[key] = full[key]
 
 
 def download_video(task_id, url):
-    with tasks_lock:
-        tasks[task_id] = {
-            "status": "downloading",
-            "percent": 0.0,
-            "speed": "",
-            "eta": "",
-            "url": url,
-            "title": "",
-            "created_at": datetime.now().isoformat(timespec="seconds"),
-            "updated_at": datetime.now().isoformat(timespec="seconds"),
-        }
+    created = manager.get_or_create(task_id, url)
+    engine = DownloadEngine(manager, ytdlp=YT_DLP,
+                            download_dir=DOWNLOAD_DIR, logger=log)
+    # 保持旧线程入口签名；pending->downloading 由引擎统一转换
+    engine.run(task_id, url)
 
-    command = [
-        YT_DLP,
-        "-f",
-        "bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080][ext=mp4]",
-        "--merge-output-format",
-        "mp4",
-        "--newline",
-        "--no-playlist",
-        "-P",
-        DOWNLOAD_DIR,
-        url,
-    ]
-    log(f"Task {task_id} start: {url}")
-    log(f"yt-dlp: {YT_DLP}")
-    try:
-        popen_kwargs = {
-            "stdout": subprocess.PIPE,
-            "stderr": subprocess.STDOUT,
-            "text": True,
-            "encoding": "utf-8",
-            "errors": "replace",
-        }
-        # 只在 Windows 上隐藏/新建控制台；POSIX 上不传该参数
-        if sys.platform == "win32":
-            popen_kwargs["creationflags"] = getattr(subprocess, "CREATE_NO_WINDOW", 0)
-        process = subprocess.Popen(command, **popen_kwargs)
-        for raw in process.stdout:
-            line = raw.strip()
-            if not line:
-                continue
-            log(f"[{task_id}] {line}")
-            # 合并阶段：yt-dlp 不再输出 [download] 百分比，固定显示 99% 合并中
-            if MERGE_RE.search(line):
-                _update(task_id, percent=99.0, speed="merging", eta="")
-                continue
-            if "[download] Destination:" in line:
-                continue
-            match = PROGRESS_RE.search(line)
-            if match:
-                _update(
-                    task_id,
-                    percent=float(match.group(1)),
-                    speed=match.group(2).strip(),
-                    eta=match.group(3).strip(),
-                )
-            # 标题回填：[info] ...: Downloading video ... / [download] ... 已有标题时跳过
-            elif line.startswith("[info]") and not _get(task_id).get("title"):
-                m = re.search(r"\[info\]\s+(.+?):\s+Downloading", line)
-                if m:
-                    _update(task_id, title=m.group(1).strip())
-        process.wait()
-        if process.returncode == 0:
-            _update(task_id, status="completed", percent=100.0, speed="", eta="")
-            log(f"Task {task_id} completed")
-        else:
-            _update(task_id, status="error")
-            log(f"Task {task_id} failed: returncode={process.returncode}")
-    except FileNotFoundError:
-        _update(task_id, status="error")
-        log(f"Task {task_id} error: yt-dlp not found at {YT_DLP}")
-    except Exception as e:
-        _update(task_id, status="error")
-        log(f"Task {task_id} error: {e}")
+
+def _error(code, message, http_code, task_id=None):
+    body = {"error_code": code, "message": message}
+    if task_id is not None:
+        body["task_id"] = task_id
+    return body, http_code
+
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         # 接管 http.server 默认日志，走统一 log()
@@ -198,7 +160,9 @@ class Handler(BaseHTTPRequestHandler):
             if tid:
                 t = _get(tid)
                 if t is None:
-                    self._json({"error": "task not found"}, code=404)
+                    body, code = _error("task_not_found", "task not found",
+                                        404, tid)
+                    self._json(body, code=code)
                 else:
                     self._json(t)
             else:
@@ -209,19 +173,17 @@ class Handler(BaseHTTPRequestHandler):
             params = parse_qs(parsed.query)
             url = params.get("url", [None])[0]
             if not url:
-                self.send_response(400)
-                self.send_cors()
-                self.end_headers()
-                self.wfile.write(b"Missing url")
+                body, code = _error("missing_url", "Missing url", 400)
+                self._json(body, code=code)
                 return
             if not (url.startswith("http://") or url.startswith("https://")):
-                self.send_response(400)
-                self.send_cors()
-                self.end_headers()
-                self.wfile.write(b"Invalid url")
+                body, code = _error("invalid_url",
+                                    "URL must use http or https", 400)
+                self._json(body, code=code)
                 return
-            # 启动后台线程
-            task_id = str(uuid.uuid4())[:8]
+            # 先创建 pending Task，再启动线程（避免查询竞态）
+            created = manager.create(url)
+            task_id = created.task_id
             thread = threading.Thread(
                 target=download_video,
                 args=(task_id, url),
@@ -231,10 +193,8 @@ class Handler(BaseHTTPRequestHandler):
             self._json({"task_id": task_id})
             return
         # 其他路径
-        self.send_response(404)
-        self.send_cors()
-        self.end_headers()
-        self.wfile.write(b"Not Found")
+        body, code = _error("not_found", "Not Found", 404)
+        self._json(body, code=code)
 
     def do_OPTIONS(self):
         self.send_response(200)

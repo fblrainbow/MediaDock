@@ -1,10 +1,20 @@
 returncode=0
 STDOUT:
-[2026-09-19 01:48:27] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
-[2026-09-19 01:48:27] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
-[2026-09-19 01:48:27] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 01:48:27] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
-[2026-09-19 01:48:28] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
+[2026-09-19 02:34:54] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
+[2026-09-19 02:34:54] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
+[2026-09-19 02:34:54] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 02:34:54] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+[2026-09-19 02:34:54] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
+[2026-09-19 02:34:55] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 02:34:55] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
+[2026-09-19 02:34:55] Task 207f7b99 start: https://example.com/v
+[2026-09-19 02:34:55] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fv HTTP/1.1" 200 -
+[2026-09-19 02:34:55] yt-dlp: C:\Tools\yt-dlp\yt-dlp.exe
+[2026-09-19 02:34:55] HTTP 127.0.0.1 "GET /status?id=207f7b99 HTTP/1.1" 200 -
+[2026-09-19 02:34:55] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
+[2026-09-19 02:34:55] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+[2026-09-19 02:34:55] HTTP 127.0.0.1 "GET /nope HTTP/1.1" 404 -
+[2026-09-19 02:34:55] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
 
 STDERR:
 test_download_invalid_url_400 (test_api.TestLiveApi.test_download_invalid_url_400) ... ok
@@ -13,18 +23,45 @@ test_health (test_api.TestLiveApi.test_health) ... ok
 test_status_all_is_dict (test_api.TestLiveApi.test_status_all_is_dict) ... ok
 test_status_missing_task_404 (test_api.TestLiveApi.test_status_missing_task_404) ... ok
 test_get_missing_returns_none (test_api.TestTaskMemoryModel.test_get_missing_returns_none) ... ok
+test_legacy_compat_update_roundtrip (test_api.TestTaskMemoryModel.test_legacy_compat_update_roundtrip) ... ok
 test_task_ids_unique (test_api.TestTaskMemoryModel.test_task_ids_unique) ... ok
-test_update_get_all_roundtrip (test_api.TestTaskMemoryModel.test_update_get_all_roundtrip) ... ok
 test_http_ok (test_api.TestUrlValidation.test_http_ok) ... ok
 test_missing_url_invalid (test_api.TestUrlValidation.test_missing_url_invalid) ... ok
 test_non_http_invalid (test_api.TestUrlValidation.test_non_http_invalid) ... ok
+test_health (test_apiv2.TestLiveApiV2.test_health) ... ok
+test_invalid_url_json (test_apiv2.TestLiveApiV2.test_invalid_url_json) ... ok
+test_legacy_fields_present (test_apiv2.TestLiveApiV2.test_legacy_fields_present) ... ok
+test_missing_url_json (test_apiv2.TestLiveApiV2.test_missing_url_json) ... ok
+test_status_all_dict (test_apiv2.TestLiveApiV2.test_status_all_dict) ... ok
+test_unknown_path_json (test_apiv2.TestLiveApiV2.test_unknown_path_json) ... ok
+test_unknown_task_json (test_apiv2.TestLiveApiV2.test_unknown_task_json) ... ok
 test_destination_line_ignored (test_baseline.TestProgressParsing.test_destination_line_ignored) ... ok
 test_hls_style_progress_lines (test_baseline.TestProgressParsing.test_hls_style_progress_lines) ... ok
 test_merger_line_detected (test_baseline.TestProgressParsing.test_merger_line_detected) ... ok
 test_normal_progress_line (test_baseline.TestProgressParsing.test_normal_progress_line) ... ok
+test_build_command_policy (test_engine.TestCommand.test_build_command_policy) ... ok
+test_failure (test_engine.TestEngine.test_failure) ... ok
+test_missing_binary (test_engine.TestEngine.test_missing_binary) ... ok
+test_success (test_engine.TestEngine.test_success) ... ok
+test_destination_ignored (test_engine.TestParser.test_destination_ignored) ... ok
+test_merging (test_engine.TestParser.test_merging) ... ok
+test_progress (test_engine.TestParser.test_progress) ... ok
+test_title (test_engine.TestParser.test_title) ... ok
+test_unknown_ignored (test_engine.TestParser.test_unknown_ignored) ... ok
+test_concurrent_writes (test_manager.TestTransitions.test_concurrent_writes) ... ok
+test_error_path (test_manager.TestTransitions.test_error_path) ... ok
+test_happy_path (test_manager.TestTransitions.test_happy_path) ... ok
+test_illegal_transitions (test_manager.TestTransitions.test_illegal_transitions) ... ok
+test_missing_task (test_manager.TestTransitions.test_missing_task) ... ok
+test_progress_reports (test_manager.TestTransitions.test_progress_reports) ... ok
+test_copy_semantics (test_task.TestTaskModel.test_copy_semantics) ... ok
+test_defaults_complete (test_task.TestTaskModel.test_defaults_complete) ... ok
+test_from_legacy_dict (test_task.TestTaskModel.test_from_legacy_dict) ... ok
+test_json_serializable (test_task.TestTaskModel.test_json_serializable) ... ok
+test_legacy_view_subset (test_task.TestTaskModel.test_legacy_view_subset) ... ok
 
 ----------------------------------------------------------------------
-Ran 15 tests in 0.579s
+Ran 42 tests in 1.155s
 
 OK
 
