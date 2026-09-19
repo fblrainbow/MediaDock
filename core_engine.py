@@ -27,9 +27,17 @@ _CANDIDATES = [
     "yt-dlp",
 ]
 
+# FFmpeg is only needed for merging; missing is a warning, not a failure.
+_FFMPEG_CANDIDATES = [
+    r"C:\Tools\ffmpeg\bin\ffmpeg.exe",
+    r"C:\Tools\ffmpeg\ffmpeg.exe",
+    "ffmpeg.exe",
+    "ffmpeg",
+]
 
-def resolve_ytdlp() -> str:
-    for c in _CANDIDATES:
+
+def _search(candidates: List[str]) -> str:
+    for c in candidates:
         if os.path.isabs(c):
             if os.path.isfile(c):
                 return c
@@ -38,7 +46,18 @@ def resolve_ytdlp() -> str:
                 full = os.path.join(p.strip('"'), c)
                 if os.path.isfile(full):
                     return full
-    return _CANDIDATES[0]
+    return ""
+
+
+def resolve_ytdlp() -> str:
+    found = _search(_CANDIDATES)
+    return found or _CANDIDATES[0]
+
+
+def resolve_ffmpeg() -> str:
+    """Best-effort FFmpeg location; `""` when it cannot be found."""
+    return _search(_FFMPEG_CANDIDATES)
+
 
 
 def default_download_dir() -> str:
@@ -48,9 +67,15 @@ def default_download_dir() -> str:
     return path
 
 
-def build_command(ytdlp: str, download_dir: str, url: str) -> List[str]:
-    return [ytdlp, "-f", FORMAT_EXPR, "--merge-output-format", "mp4",
-            "--newline", "--no-playlist", "-P", download_dir, url]
+def build_command(ytdlp: str, download_dir: str, url: str,
+                  ffmpeg_path: str = "") -> List[str]:
+    """argv list for one download; no shell, URL is always a single argument."""
+    command = [ytdlp, "-f", FORMAT_EXPR, "--merge-output-format", "mp4",
+               "--newline", "--no-playlist"]
+    if ffmpeg_path:
+        command += ["--ffmpeg-location", str(ffmpeg_path)]
+    command += ["-P", download_dir, url]
+    return command
 
 
 @dataclass
@@ -65,10 +90,12 @@ class DownloadEngine:
     def __init__(self, manager, ytdlp: Optional[str] = None,
                  download_dir: Optional[str] = None,
                  popen_factory: Optional[Callable] = None,
-                 logger: Optional[Callable[..., None]] = None):
+                 logger: Optional[Callable[..., None]] = None,
+                 ffmpeg: Optional[str] = None):
         self.manager = manager
         self.ytdlp = ytdlp or resolve_ytdlp()
         self.download_dir = download_dir or default_download_dir()
+        self.ffmpeg = ffmpeg or ""
         self._popen_factory = popen_factory or subprocess.Popen
         self._log = logger or (lambda *a: None)
 
@@ -84,9 +111,12 @@ class DownloadEngine:
             return self._finish_cancelled(task_id, control)
         if control.pause_requested():
             return self._finish_paused(task_id)
-        command = build_command(self.ytdlp, self.download_dir, url)
+        command = build_command(self.ytdlp, self.download_dir, url,
+                                self.ffmpeg)
         self._log(f"Task {task_id} start: {url}")
         self._log(f"yt-dlp: {self.ytdlp}")
+        if self.ffmpeg:
+            self._log(f"ffmpeg: {self.ffmpeg}")
         try:
             kwargs = {"stdout": subprocess.PIPE, "stderr": subprocess.STDOUT,
                       "text": True, "encoding": "utf-8", "errors": "replace"}

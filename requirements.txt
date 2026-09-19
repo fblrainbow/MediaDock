@@ -1,5 +1,7 @@
 # MediaDock runtime dependencies (Stage-001 baseline).
 # server.py + tests use Python 3.13 stdlib only; no third-party packages.
+# Stage-006 (config/deps/security) stays stdlib-only as well
+# (json/os/shutil/subprocess/dataclasses/urllib are all built in).
 # If a new package is added later, pin it here.
 # Venv: C:\Users\Administrator\Envs\mediadock\Scripts\python.exe
 

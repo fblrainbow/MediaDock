@@ -1,0 +1,15 @@
+{
+  "host": "127.0.0.1",
+  "port": 8765,
+  "allow_lan": false,
+  "download_dir": "downloads",
+  "ytdlp_path": "",
+  "ffmpeg_path": "",
+  "log_level": "info",
+  "log_file": "MediaDock-server.log",
+  "db_path": "",
+  "max_active_tasks": 3,
+  "purge_keep": 200,
+  "request_max_bytes": 65536,
+  "log_line_max": 4000
+}

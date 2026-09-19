@@ -173,6 +173,12 @@ def main():
         # 2) 继续：第二次运行启动时断点文件仍在（yt-dlp --continue 复用）
         body = control("resume", paused_task)
         assert body["status"] == "downloading", body
+        # 引擎线程与断言存在竞态（status 先变，stdout 迭代后才回调 on_start）：
+        # 等第二次运行真正开始，而不是假定它已经发生
+        deadline = time.monotonic() + 10.0
+        while len(runs.get(VIDEO_ID, [])) < 2 and time.monotonic() < deadline:
+            time.sleep(0.02)
+        assert len(runs.get(VIDEO_ID, [])) >= 2, runs
         assert runs[VIDEO_ID][1]["part_existed_before_start"] is True, runs
 
         # 3) 取消：状态 cancelled，断点与本次输出都被删除

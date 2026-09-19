@@ -185,6 +185,10 @@ cython_debug/
 *.db-wal
 *.db-shm
 *.db.bak
+# Stage-006: local configuration (copy config.example.json when needed)
+config.json
+# Local scratch files used while developing/verifying
+_tmp_*
 YouTube Ultimate Downloader v13.3.js
 多合一视频下载器【2026最新】- 支持 YouTube, TikTok, X(Twitter), Instagram, Facebook.js
 多合一视频下载器（支持：YouTube, TikTok, Instagram等）.js

@@ -7,60 +7,154 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlparse, parse_qs
 
+from core_config import (Config, config_public, load_config)
 from core_control import ControlError
-from core_engine import DownloadEngine
+from core_deps import failed_checks, run_checks
+from core_engine import DownloadEngine, resolve_ffmpeg
 from core_listing import (build_history, build_task_list, normalize_limit,
                           HISTORY_DEFAULT_LIMIT, HISTORY_STATUSES)
 from core_manager import TaskManager
 from core_parse import MERGE_RE, PROGRESS_RE
 from core_scheduler import MAX_ACTIVE_TASKS, Scheduler
+from core_security import (body_within_limit, check_host_header, check_origin,
+                           clip, redact, validate_url)
 from core_store import (PURGE_KEEP_DEFAULT, TaskPersister, open_store,
                         resolve_db_path)
 from core_task import Task
 
 # =========================
-# 日志：同时写文件 + 保留控制台（pythonw 下控制台为空也不报错）
-# =========================
-LOG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "MediaDock-server.log")
-_log_fp = open(LOG_FILE, "a", encoding="utf-8", buffering=1)
-# 进程退出时关闭日志句柄，避免 unittest 报 ResourceWarning
-atexit.register(lambda: _log_fp.close())
-
-
-def log(*args):
-    msg = " ".join(str(a) for a in args)
-    line = f"[{datetime.now():%Y-%m-%d %H:%M:%S}] {msg}"
-    try:
-        print(line, flush=True)
-    except Exception:
-        pass
-    try:
-        _log_fp.write(line + "\n")
-    except Exception:
-        pass
-
-
-# =========================
-# 配置（Stage-002：值与 Stage-001 一致，来源收敛到 core_engine）
+# 配置 (Stage-006)：路径/端口/日志/数据库的唯一真值来源是 core_config.Config
 # =========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+LEVEL_RANK = {"debug": 10, "info": 20, "warning": 30, "error": 40}
+
+CONFIG = None
+CONFIG_ERRORS = []
+HOST = "127.0.0.1"
+PORT = 8765
 DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
-os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+YT_DLP = ""
+FFMPEG = ""
+LOG_FILE = os.path.join(BASE_DIR, "MediaDock-server.log")
+LOG_LEVEL = "info"
+LOG_MAX_LINE = 4000
+DEPENDENCIES = {}
+
+_log_fp = None
+
+
+def _open_log_file(path):
+    """(Re)open the configured log file; keep the old handle on failure.
+
+    A missing/unwritable log file must not stop the server, so failures are
+    reported on stderr only (Stage-006.md 9.1).
+    """
+    global _log_fp, LOG_FILE
+    target = str(path or "")
+    try:
+        handle = open(target, "a", encoding="utf-8", buffering=1)
+    except OSError as exc:
+        print(f"[MediaDock] cannot open log file {target}: {exc}", flush=True)
+        LOG_FILE = target
+        return False
+    if _log_fp is not None:
+        try:
+            _log_fp.close()
+        except Exception:  # noqa: BLE001 - reopening must not fail on this
+            pass
+    _log_fp = handle
+    LOG_FILE = target
+    return True
+
+
+def _close_log_file():
+    global _log_fp
+    if _log_fp is not None:
+        try:
+            _log_fp.close()
+        except Exception:  # noqa: BLE001 - process shutdown best effort
+            pass
+
+
+# 进程退出时关闭日志句柄，避免 unittest 报 ResourceWarning
+atexit.register(_close_log_file)
+
+
+def log(*args, level="info"):
+    """Log with level filtering and redaction (Stage-006.md 5.5/任务006)."""
+    rank = LEVEL_RANK.get(str(level).lower(), LEVEL_RANK["info"])
+    if rank < LEVEL_RANK.get(LOG_LEVEL, LEVEL_RANK["info"]):
+        return
+    msg = " ".join(str(a) for a in args)
+    stamp = f"[{datetime.now():%Y-%m-%d %H:%M:%S}] "
+    line = clip(stamp + redact(msg, LOG_MAX_LINE), LOG_MAX_LINE)
+    try:
+        print(line, flush=True)
+    except Exception:  # noqa: BLE001 - pythonw has no console
+        pass
+    if _log_fp is not None:
+        try:
+            _log_fp.write(line + "\n")
+        except Exception:  # noqa: BLE001 - logging must never raise
+            pass
+
 
 # yt-dlp 查找：优先固定路径，其次 PATH 中的 yt-dlp / yt-dlp.exe
-_CANDIDATES = [
-    r"C:\Tools\yt-dlp\yt-dlp.exe",
-    "yt-dlp.exe",
-    "yt-dlp",
-]
-
-
 def resolve_ytdlp():
     from core_engine import resolve_ytdlp as _resolve
     return _resolve()
 
 
-YT_DLP = resolve_ytdlp()
+def effective_db_path(explicit=None):
+    """`explicit` > `config.db_path` > `MEDIADOCK_DB` > `<仓库>/tasks.db`."""
+    if explicit:
+        return explicit
+    if CONFIG is not None and CONFIG.db_path:
+        return CONFIG.db_path
+    return resolve_db_path(None)
+
+
+def apply_config(config):
+    """Point every module-level truth at `config` (Stage-006.md 5.6)."""
+    global CONFIG, CONFIG_ERRORS, HOST, PORT, DOWNLOAD_DIR, YT_DLP, FFMPEG
+    global LOG_LEVEL, LOG_MAX_LINE, DB_PATH
+    CONFIG = config
+    CONFIG_ERRORS = list(config.errors)
+    HOST = config.host
+    PORT = config.port
+    DOWNLOAD_DIR = config.download_dir
+    YT_DLP = config.ytdlp_path or resolve_ytdlp()
+    FFMPEG = config.ffmpeg_path or resolve_ffmpeg()
+    LOG_LEVEL = config.log_level
+    LOG_MAX_LINE = config.log_line_max
+    _open_log_file(config.log_file)
+    DB_PATH = effective_db_path(None)
+    return config
+
+
+def reload_config(path=None, env=None):
+    """Reload configuration from disk/env and apply it (no restart needed)."""
+    return apply_config(load_config(path=path, env=env, logger=log))
+
+
+def dependencies_info():
+    """Startup dependency snapshot (created by `refresh_dependencies`)."""
+    return DEPENDENCIES
+
+
+def refresh_dependencies(deep=False):
+    """Re-run yt-dlp/FFmpeg/dir/disk checks; never blocks the server."""
+    global DEPENDENCIES
+    DEPENDENCIES = run_checks(CONFIG, log, deep=deep)
+    failed = failed_checks(DEPENDENCIES)
+    if failed:
+        log(f"dependency check failed: {', '.join(failed)}", level="warning")
+    return DEPENDENCIES
+
+
+CONFIG = load_config(logger=log)
+apply_config(CONFIG)
 
 # =========================
 # Stage-005: 存储 + Task Manager + Scheduler 由 bootstrap() 统一装配
@@ -76,7 +170,7 @@ storage = None
 storage_reason = ""
 tasks = {}
 tasks_lock = None
-DB_PATH = resolve_db_path(None)
+DB_PATH = effective_db_path(None)
 
 # =========================
 # Scheduler (Stage-003: 活动槽位 + FIFO 等待队列的唯一决策点)
@@ -84,7 +178,7 @@ DB_PATH = resolve_db_path(None)
 def _make_engine():
     """每次运行构造一个引擎；yt-dlp 路径延迟读取，便于测试/探针替换。"""
     return DownloadEngine(manager, ytdlp=YT_DLP, download_dir=DOWNLOAD_DIR,
-                          logger=log)
+                          logger=log, ffmpeg=FFMPEG)
 
 
 scheduler = None
@@ -131,15 +225,23 @@ def storage_info():
     return info
 
 
-def bootstrap(db_path=None):
-    """(Re)build storage + manager + scheduler; safe to call again (tests)."""
+def bootstrap(db_path=None, config=None):
+    """(Re)build storage + manager + scheduler; safe to call again (tests).
+
+    Precedence for the database file (Stage-006.md 5.1): explicit `db_path`
+    > `Config.db_path` > `MEDIADOCK_DB` > `<repo>/tasks.db`.
+    """
     global manager, scheduler, tasks, tasks_lock, storage, storage_reason
+    global DB_PATH
+    if config is not None:
+        apply_config(config)
     if storage is not None:
         try:
             storage.close()
         except Exception:  # noqa: BLE001 - reopening must not fail on this
             pass
-    store, reason = open_store(db_path, log)
+    DB_PATH = effective_db_path(db_path)
+    store, reason = open_store(DB_PATH, log)
     storage = store
     storage_reason = reason
     persister = TaskPersister(store, log) if store is not None else None
@@ -147,15 +249,17 @@ def bootstrap(db_path=None):
     interrupted = []
     if store is not None:
         interrupted = _apply_restart_matrix(store, manager)
-        purged = store.purge_terminal(PURGE_KEEP_DEFAULT)
+        purged = store.purge_terminal(CONFIG.purge_keep or PURGE_KEEP_DEFAULT)
         log(f"storage ready: {len(manager.ids())} task(s) loaded, "
             f"{len(interrupted)} marked interrupted, {purged} purged")
     else:
         log("storage disabled: running from memory only")
-    scheduler = Scheduler(manager, _make_engine, max_active=MAX_ACTIVE_TASKS,
+    scheduler = Scheduler(manager, _make_engine,
+                          max_active=CONFIG.max_active_tasks,
                           logger=log, download_dir=DOWNLOAD_DIR)
     tasks = manager._tasks
     tasks_lock = manager._lock
+    refresh_dependencies()
     return manager, scheduler
 
 
@@ -309,11 +413,31 @@ class Handler(BaseHTTPRequestHandler):
     def send_cors(self):
         self.send_header("Access-Control-Allow-Origin", "*")
 
+    def _guard(self):
+        """Host/Origin gate (Stage-006.md 5.5). False => response already sent."""
+        ok, detail = check_host_header(self.headers.get("Host"), PORT)
+        if not ok:
+            log(f"request rejected: {detail}", level="warning")
+            body, code = _error("forbidden_host", detail, 403)
+            self._json(body, code=code)
+            return False
+        ok, detail = check_origin(self.headers.get("Origin"))
+        if not ok:
+            log(f"request rejected: {detail}", level="warning")
+            body, code = _error("forbidden_origin", detail, 403)
+            self._json(body, code=code)
+            return False
+        return True
+
     def do_GET(self):
+        if not self._guard():
+            return
         parsed = urlparse(self.path)
-        # 健康检查 (plan.md #9 / Stage-005: 附存储状态)
+        # 健康检查 (plan.md #9 / Stage-005 存储 / Stage-006 配置与依赖)
         if parsed.path == "/health":
-            self._json({"status": "ok", "storage": storage_info()})
+            self._json({"status": "ok", "storage": storage_info(),
+                        "config": config_public(CONFIG),
+                        "dependencies": dependencies_info()})
             return
         # 共享任务列表：全量任务（契约排序）+ 调度器计数 (Stage-003)
         if parsed.path == "/tasks":
@@ -390,9 +514,9 @@ class Handler(BaseHTTPRequestHandler):
                 body, code = _error("missing_url", "Missing url", 400)
                 self._json(body, code=code)
                 return
-            if not (url.startswith("http://") or url.startswith("https://")):
-                body, code = _error("invalid_url",
-                                    "URL must use http or https", 400)
+            ok, code_name, message = validate_url(url)
+            if not ok:
+                body, code = _error(code_name, message, 400)
                 self._json(body, code=code)
                 return
             # 创建 pending Task 后交给调度器：有空闲槽位就启动，否则 FIFO 排队
@@ -405,11 +529,19 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         """控制接口 (Stage-004)：JSON body {"task_id": "..."}。"""
+        if not self._guard():
+            return
         parsed = urlparse(self.path)
         try:
             length = int(self.headers.get("Content-Length") or 0)
         except (TypeError, ValueError):
             length = 0
+        if not body_within_limit(length, CONFIG.request_max_bytes):
+            body, code = _error(
+                "payload_too_large",
+                f"body must be at most {CONFIG.request_max_bytes} bytes", 413)
+            self._json(body, code=code)
+            return
         raw = self.rfile.read(length) if length > 0 else b""
         if not raw:
             body, code = _error("bad_request", "Expected a JSON object body", 400)
@@ -432,6 +564,8 @@ class Handler(BaseHTTPRequestHandler):
         self._json(body, code=code)
 
     def do_OPTIONS(self):
+        if not self._guard():
+            return
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
@@ -452,23 +586,64 @@ class MediaDockServer(ThreadingHTTPServer):
     allow_reuse_address = False
 
 
-def main():
+def run_check_config(argv):
+    """`--check-config` CLI: print config + dependency diagnostics, no server.
+
+    Exit code 0 = configuration valid and dependencies usable, 1 = a problem
+    was found, 2 = bad command line.
+    """
+    args = list(argv)
+    path = None
+    deep = False
+    while args:
+        arg = args.pop(0)
+        if arg == "--check-config":
+            continue
+        if arg == "--config":
+            if not args:
+                print("--config requires a file path")
+                return 2
+            path = args.pop(0)
+        elif arg == "--probe":
+            deep = True
+        else:
+            print(f"unknown option: {arg}")
+            return 2
+    config = load_config(path=path, logger=log)
+    snapshot = run_checks(config, log, deep=deep)
+    payload = {"config": config_public(config), "dependencies": snapshot}
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    return 0 if config.ok() and snapshot["ok"] else 1
+
+
+def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if "--check-config" in argv:
+        sys.exit(run_check_config(argv))
     try:
-        server = MediaDockServer(("127.0.0.1", 8765), Handler)
+        server = MediaDockServer((HOST, PORT), Handler)
     except OSError as exc:
-        log(f"ERROR: cannot bind 127.0.0.1:8765 ({exc})")
+        log(f"ERROR: cannot bind {HOST}:{PORT} ({exc})", level="error")
         log("另一个 MediaDock 实例可能已在运行；请先结束它再启动。")
         log("提示：Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" "
             "| Where-Object { $_.CommandLine -like '*server.py*' }")
         sys.exit(2)
     log("MediaDock server started")
-    log("http://127.0.0.1:8765")
+    log(f"http://{HOST}:{PORT}")
+    log(f"config: source={CONFIG.source} "
+        f"path={CONFIG.path or '(built-in defaults)'} "
+        f"errors={len(CONFIG.errors)} warnings={len(CONFIG.warnings)}")
     log(f"downloads: {DOWNLOAD_DIR}")
     log(f"yt-dlp: {YT_DLP}")
+    log(f"ffmpeg: {FFMPEG or '(not found - merging may fail)'}")
     log(f"max active downloads: {scheduler.active_limit}")
     info = storage_info()
     log(f"storage: {info['kind']} ({info.get('db')}) "
         f"schema=v{info.get('schema_version')} degraded={info.get('degraded')}")
+    deps = dependencies_info()
+    summary = ", ".join(f"{c['name']}={c['status']}"
+                        for c in deps.get("checks", []))
+    log(f"dependencies: ok={deps.get('ok')} [{summary}]")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

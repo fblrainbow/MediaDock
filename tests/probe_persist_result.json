@@ -1,6 +1,6 @@
 {
-  "db": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-persist-ts4dt1dy\\tasks.db",
-  "base": "http://127.0.0.1:55897",
+  "db": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-persist-z0p4kwq7\\tasks.db",
+  "base": "http://127.0.0.1:50123",
   "bind": "127.0.0.1",
   "schema_version": 2,
   "engine_stub": "scripted process (spawn replaced)",
@@ -25,12 +25,12 @@
     "records_after_reopen": true
   },
   "task_ids": {
-    "completed": "925d35ef",
-    "paused": "d780e7dd",
-    "interrupted_downloading": "98e1a639",
-    "interrupted_pending": "d70696af"
+    "completed": "6f80d675",
+    "paused": "a42a111f",
+    "interrupted_downloading": "bc9de1c9",
+    "interrupted_pending": "520386ea"
   },
   "history_total": 3,
-  "backup": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-persist-ts4dt1dy\\tasks.db.bak",
+  "backup": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-persist-z0p4kwq7\\tasks.db.bak",
   "failed_checks": []
 }

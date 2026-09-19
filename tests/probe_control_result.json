@@ -1,8 +1,8 @@
 {
-  "base": "http://127.0.0.1:56026",
+  "base": "http://127.0.0.1:59570",
   "bind": "127.0.0.1",
   "engine_stub": "scripted process (spawn replaced)",
-  "download_dir": "E:\\GitHub\\MediaDock\\downloads",
+  "download_dir": "e:\\GitHub\\MediaDock\\downloads",
   "runs": {
     "PROBECTRL01": [
       {
@@ -39,16 +39,16 @@
       }
     ]
   },
-  "paused_task": "3e264db5",
+  "paused_task": "0e5bc06f",
   "pause_kept_breakpoint": true,
   "resume_reused_breakpoint": true,
   "cancel_cleaned_files": true,
   "isolation": {
-    "paused": "bd1395cb",
-    "untouched": "07bdfa73"
+    "paused": "62079f05",
+    "untouched": "7a03b3c9"
   },
   "queued_cancel": {
-    "queued_task": "3f20e06f"
+    "queued_task": "deb71f72"
   },
   "scheduler": {
     "active_count": 3,
