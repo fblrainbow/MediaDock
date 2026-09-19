@@ -266,7 +266,7 @@ class TestControlErrors(ControlApiBase):
         self.assertEqual(data["error_code"], "not_retryable")
 
     def test_unknown_control_path(self):
-        code, data = self.post("/delete", {"task_id": "abc"})
+        code, data = self.post("/purge", {"task_id": "abc"})
         self.assertEqual(code, 404)
         self.assertEqual(data["error_code"], "not_found")
 

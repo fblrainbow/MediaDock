@@ -172,5 +172,109 @@ class TestStage004Transitions(unittest.TestCase):
             m.transition(task.task_id, "downloaded")
 
 
+class FakePersister:
+    """Records what TaskManager asked the store to do."""
+
+    def __init__(self):
+        self.saves = []
+        self.deletes = []
+        self.events = []
+
+    def save_task(self, data):
+        self.saves.append(data["task_id"])
+        return True
+
+    def delete_task(self, task_id):
+        self.deletes.append(task_id)
+        return True
+
+    def record_event(self, task_id, kind, detail=""):
+        self.events.append((task_id, kind, detail))
+        return True
+
+
+class BoomPersister:
+    """Every call raises; TaskManager must survive it."""
+
+    def save_task(self, data):
+        raise RuntimeError("store exploded")
+
+    def delete_task(self, task_id):
+        raise RuntimeError("store exploded")
+
+    def record_event(self, task_id, kind, detail=""):
+        raise RuntimeError("store exploded")
+
+
+class TestPersistenceHooks(unittest.TestCase):
+    """T511-T513: write-back, throttling, failure isolation, restore."""
+
+    def test_create_transition_and_drop_write_back(self):
+        persister = FakePersister()
+        manager = TaskManager(persister=persister)
+        task = manager.create("https://example.com/v")
+        manager.transition(task.task_id, "downloading")
+        manager.transition(task.task_id, "completed", percent=100.0)
+        self.assertEqual(persister.saves, [task.task_id] * 3)
+        self.assertEqual(persister.events[0][1], "created")
+        self.assertEqual(persister.events[-1][1], "transition")
+        self.assertEqual(persister.events[-1][2], "downloading->completed")
+        manager.drop(task.task_id)
+        self.assertEqual(persister.deletes, [task.task_id])
+
+    def test_progress_writes_are_throttled(self):
+        persister = FakePersister()
+        manager = TaskManager(persister=persister, persist_interval=3600)
+        task = manager.create("https://example.com/v")
+        manager.transition(task.task_id, "downloading")
+        before = len(persister.saves)
+        for _ in range(5):
+            manager.report_progress(task.task_id, 25.0)
+        self.assertEqual(len(persister.saves), before)
+
+        fast = FakePersister()
+        other = TaskManager(persister=fast, persist_interval=0.0)
+        second = other.create("https://example.com/w")
+        other.transition(second.task_id, "downloading")
+        start = len(fast.saves)
+        for percent in (10.0, 20.0, 30.0):
+            other.report_progress(second.task_id, percent)
+        self.assertEqual(len(fast.saves), start + 3)
+
+    def test_persister_errors_do_not_break_state(self):
+        manager = TaskManager(persister=BoomPersister())
+        task = manager.create("https://example.com/v")
+        manager.transition(task.task_id, "downloading")
+        manager.report_progress(task.task_id, 5.0)
+        self.assertEqual(manager.get(task.task_id).percent, 5.0)
+        manager.drop(task.task_id)
+        self.assertIsNone(manager.get(task.task_id))
+
+    def test_load_task_restores_fields_and_sequence(self):
+        manager = TaskManager()
+        manager.load_task({"task_id": "restored", "status": "completed",
+                           "percent": 100.0,
+                           "completed_at": "2026-09-19T10:00:00",
+                           "completion_order": 7})
+        restored = manager.get("restored")
+        self.assertEqual(restored.status, "completed")
+        self.assertEqual(restored.completion_order, 7)
+        self.assertEqual(manager.completion_seq(), 7)
+        task = manager.create("https://example.com/v")
+        manager.transition(task.task_id, "downloading")
+        manager.transition(task.task_id, "completed")
+        self.assertEqual(manager.get(task.task_id).completion_order, 8)
+        with self.assertRaises(ValueError):
+            manager.load_task({"status": "pending"})
+
+    def test_manager_without_persister_still_works(self):
+        manager = TaskManager()
+        task = manager.create("https://example.com/v")
+        manager.transition(task.task_id, "downloading")
+        manager.report_progress(task.task_id, 12.5)
+        manager.transition(task.task_id, "completed")
+        self.assertEqual(manager.get(task.task_id).status, "completed")
+
+
 if __name__ == "__main__":
     unittest.main()

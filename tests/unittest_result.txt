@@ -1,111 +1,236 @@
-[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
-.[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
-.[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-.[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
-.[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
-.......[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-.[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
-.[2026-09-19 04:18:39] Scheduler start c0fe34a4 (active=1, queued=0)
-[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fv HTTP/1.1" 200 -
-[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /status?id=c0fe34a4 HTTP/1.1" 200 -
-.[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
-.[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
-.[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /nope HTTP/1.1" 404 -
-.[2026-09-19 04:18:39] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
-................[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-.[2026-09-19 04:18:44] Scheduler start a471c81b (active=1, queued=0)
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnc1 HTTP/1.1" 200 -
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 409 -
-.[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-.[2026-09-19 04:18:44] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-.[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-.[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-.[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-.[2026-09-19 04:18:44] Scheduler start 28c6b486 (active=1, queued=0)
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnp0 HTTP/1.1" 200 -
-[2026-09-19 04:18:44] Scheduler start a2fecc72 (active=2, queued=0)
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnp1 HTTP/1.1" 200 -
-[2026-09-19 04:18:44] Scheduler start f00200b4 (active=3, queued=0)
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnp2 HTTP/1.1" 200 -
-[2026-09-19 04:18:44] Scheduler queued cd6c576a (active=3, queued=1)
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnp3 HTTP/1.1" 200 -
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 409 -
-[2026-09-19 04:18:44] Scheduler start cd6c576a (active=3, queued=0)
-.[2026-09-19 04:18:44] Scheduler start 2bbf8426 (active=1, queued=0)
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnr1 HTTP/1.1" 200 -
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /resume HTTP/1.1" 409 -
-.[2026-09-19 04:18:44] Scheduler start 20bbbf06 (active=1, queued=0)
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fny1 HTTP/1.1" 200 -
-[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /retry HTTP/1.1" 409 -
-.[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 404 -
-.[2026-09-19 04:18:44] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 404 -
-.[2026-09-19 04:18:45] Scheduler start fce142b6 (active=1, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fcancel1 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
-.[2026-09-19 04:18:45] Scheduler start fc45bbcf (active=1, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fq0 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] Scheduler start 61b26420 (active=2, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fq1 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] Scheduler start 19bc2059 (active=3, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fq2 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] Scheduler queued 84428699 (active=3, queued=1)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fq3 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] Scheduler skipped cleanup for 84428699: no started_at
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
-.[2026-09-19 04:18:45] Scheduler start abf456a4 (active=1, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fiso1 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] Scheduler start f9e605c5 (active=2, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fiso2 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
-.[2026-09-19 04:18:45] HTTP 127.0.0.1 "OPTIONS /pause HTTP/1.1" 200 -
-.[2026-09-19 04:18:45] Scheduler start 2fef3eaf (active=1, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fs0 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] Scheduler start febfcd48 (active=2, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fs1 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] Scheduler start 87d957da (active=3, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fs2 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] Scheduler queued 2b8e71cd (active=3, queued=1)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fs3 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] Scheduler start 2b8e71cd (active=3, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
-.[2026-09-19 04:18:45] Scheduler start ddb671bb (active=1, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fpause1 HTTP/1.1" 200 -
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
-[2026-09-19 04:18:45] Scheduler start ddb671bb (active=1, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "POST /resume HTTP/1.1" 200 -
-.[2026-09-19 04:18:45] Scheduler start 78762755 (active=1, queued=0)
-[2026-09-19 04:18:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fretry1 HTTP/1.1" 200 -
-[2026-09-19 04:18:46] Scheduler start 78762755 (active=1, queued=0)
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "POST /retry HTTP/1.1" 200 -
-..........................................[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
-.[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
-.[2026-09-19 04:18:46] Scheduler start 7c545c5e (active=1, queued=0)
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fm0 HTTP/1.1" 200 -
-[2026-09-19 04:18:46] Scheduler start 159ddf7e (active=1, queued=0)
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fm1 HTTP/1.1" 200 -
-[2026-09-19 04:18:46] Scheduler start d2a66ac7 (active=1, queued=0)
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fm2 HTTP/1.1" 200 -
-[2026-09-19 04:18:46] Scheduler start cc86e7de (active=1, queued=0)
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fm3 HTTP/1.1" 200 -
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /status?id=7c545c5e HTTP/1.1" 200 -
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /status?id=159ddf7e HTTP/1.1" 200 -
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /status?id=d2a66ac7 HTTP/1.1" 200 -
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /status?id=cc86e7de HTTP/1.1" 200 -
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-.[2026-09-19 04:18:46] Scheduler start 0a9db63f (active=1, queued=0)
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fsolo HTTP/1.1" 200 -
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /status?id=0a9db63f HTTP/1.1" 200 -
-.[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-.[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-.[2026-09-19 04:18:46] HTTP 127.0.0.1 "GET /nope HTTP/1.1" 404 -
-.............................
+[2026-09-19 09:39:27] storage migrated to schema v2
+[2026-09-19 09:39:27] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:27] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
+.[2026-09-19 09:39:27] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
+.[2026-09-19 09:39:27] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+.[2026-09-19 09:39:27] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+.[2026-09-19 09:39:27] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
+.......[2026-09-19 09:39:28] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+.[2026-09-19 09:39:28] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
+.[2026-09-19 09:39:28] Scheduler start 3eeba46e (active=1, queued=0)
+[2026-09-19 09:39:28] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fv HTTP/1.1" 200 -
+[2026-09-19 09:39:28] HTTP 127.0.0.1 "GET /status?id=3eeba46e HTTP/1.1" 200 -
+.[2026-09-19 09:39:28] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
+.[2026-09-19 09:39:28] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+.[2026-09-19 09:39:28] HTTP 127.0.0.1 "GET /nope HTTP/1.1" 404 -
+.[2026-09-19 09:39:28] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
+................[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+.[2026-09-19 09:39:33] Scheduler start 3366c4af (active=1, queued=0)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnc1 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 409 -
+.[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+.[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+.[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+.[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+.[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+.[2026-09-19 09:39:33] Scheduler start bd409121 (active=1, queued=0)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnp0 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] Scheduler start 7962b9f2 (active=2, queued=0)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnp1 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] Scheduler start 6f04c975 (active=3, queued=0)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnp2 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] Scheduler queued 1178345b (active=3, queued=1)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnp3 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 409 -
+[2026-09-19 09:39:33] Scheduler start 1178345b (active=3, queued=0)
+.[2026-09-19 09:39:33] Scheduler start 86b36e2c (active=1, queued=0)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fnr1 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /resume HTTP/1.1" 409 -
+.[2026-09-19 09:39:33] Scheduler start 5c005746 (active=1, queued=0)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fny1 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /retry HTTP/1.1" 409 -
+.[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /purge HTTP/1.1" 404 -
+.[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 404 -
+.[2026-09-19 09:39:33] Scheduler start cf01e662 (active=1, queued=0)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fcancel1 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
+.[2026-09-19 09:39:33] Scheduler start 1b8ff33a (active=1, queued=0)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fq0 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] Scheduler start 3e4eb98d (active=2, queued=0)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fq1 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] Scheduler start c89ecf81 (active=3, queued=0)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fq2 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] Scheduler queued a81a6e69 (active=3, queued=1)
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fq3 HTTP/1.1" 200 -
+[2026-09-19 09:39:33] Scheduler skipped cleanup for a81a6e69: no started_at
+[2026-09-19 09:39:33] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
+.[2026-09-19 09:39:34] Scheduler start 78600ae9 (active=1, queued=0)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fiso1 HTTP/1.1" 200 -
+[2026-09-19 09:39:34] Scheduler start 1e2bdde9 (active=2, queued=0)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fiso2 HTTP/1.1" 200 -
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
+.[2026-09-19 09:39:34] HTTP 127.0.0.1 "OPTIONS /pause HTTP/1.1" 200 -
+.[2026-09-19 09:39:34] Scheduler start 3a58ed17 (active=1, queued=0)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fs0 HTTP/1.1" 200 -
+[2026-09-19 09:39:34] Scheduler start d3336ed2 (active=2, queued=0)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fs1 HTTP/1.1" 200 -
+[2026-09-19 09:39:34] Scheduler start ad26ded4 (active=3, queued=0)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fs2 HTTP/1.1" 200 -
+[2026-09-19 09:39:34] Scheduler queued d6abf0c0 (active=3, queued=1)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fs3 HTTP/1.1" 200 -
+[2026-09-19 09:39:34] Scheduler start d6abf0c0 (active=3, queued=0)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
+.[2026-09-19 09:39:34] Scheduler start af994065 (active=1, queued=0)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fpause1 HTTP/1.1" 200 -
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
+[2026-09-19 09:39:34] Scheduler start af994065 (active=1, queued=0)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "POST /resume HTTP/1.1" 200 -
+.[2026-09-19 09:39:34] Scheduler start ec54213e (active=1, queued=0)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fretry1 HTTP/1.1" 200 -
+[2026-09-19 09:39:34] Scheduler start ec54213e (active=1, queued=0)
+[2026-09-19 09:39:34] HTTP 127.0.0.1 "POST /retry HTTP/1.1" 200 -
+...............................[2026-09-19 09:39:35] storage migrated to schema v2
+[2026-09-19 09:39:35] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:35] Scheduler start df543bdc (active=1, queued=0)
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fd1 HTTP/1.1" 200 -
+[2026-09-19 09:39:35] deleted task df543bdc (completed)
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 200 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /status?id=df543bdc HTTP/1.1" 404 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
+.[2026-09-19 09:39:35] storage migrated to schema v2
+[2026-09-19 09:39:35] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:35] Scheduler start f5dc8db1 (active=1, queued=0)
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Frun HTTP/1.1" 200 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 409 -
+.[2026-09-19 09:39:35] storage migrated to schema v2
+[2026-09-19 09:39:35] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 404 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 400 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 400 -
+.[2026-09-19 09:39:35] storage migrated to schema v2
+[2026-09-19 09:39:35] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+.[2026-09-19 09:39:35] storage migrated to schema v2
+[2026-09-19 09:39:35] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
+.[2026-09-19 09:39:35] storage migrated to schema v2
+[2026-09-19 09:39:35] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:35] Scheduler start 22357b40 (active=1, queued=0)
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fe1 HTTP/1.1" 200 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /events?id=22357b40 HTTP/1.1" 200 -
+.[2026-09-19 09:39:35] storage migrated to schema v2
+[2026-09-19 09:39:35] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /events HTTP/1.1" 400 -
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /events?id=../etc/passwd HTTP/1.1" 400 -
+.[2026-09-19 09:39:35] storage migrated to schema v2
+[2026-09-19 09:39:35] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:35] HTTP 127.0.0.1 "GET /events?id=no-such-task HTTP/1.1" 404 -
+.[2026-09-19 09:39:36] storage migrated to schema v2
+[2026-09-19 09:39:36] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
+.[2026-09-19 09:39:36] storage migrated to schema v2
+[2026-09-19 09:39:36] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:36] Scheduler start ad68a445 (active=1, queued=0)
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fh1 HTTP/1.1" 200 -
+[2026-09-19 09:39:36] Scheduler start 3e52875d (active=1, queued=0)
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fh2 HTTP/1.1" 200 -
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
+.[2026-09-19 09:39:36] storage migrated to schema v2
+[2026-09-19 09:39:36] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:36] Scheduler start bdbd7dac (active=1, queued=0)
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fh3 HTTP/1.1" 200 -
+[2026-09-19 09:39:36] Scheduler start d2697ffe (active=1, queued=0)
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fh4 HTTP/1.1" 200 -
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /history?limit=1 HTTP/1.1" 200 -
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /history?status=completed HTTP/1.1" 200 -
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /history?status=error HTTP/1.1" 200 -
+.[2026-09-19 09:39:36] storage migrated to schema v2
+[2026-09-19 09:39:36] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /history?limit=0 HTTP/1.1" 400 -
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /history?limit=abc HTTP/1.1" 400 -
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /history?limit=500 HTTP/1.1" 400 -
+[2026-09-19 09:39:36] HTTP 127.0.0.1 "GET /history?status=downloading HTTP/1.1" 400 -
+............[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+.[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
+.[2026-09-19 09:39:37] Scheduler start 66a25e0b (active=1, queued=0)
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fm0 HTTP/1.1" 200 -
+[2026-09-19 09:39:37] Scheduler start 2d5b605b (active=1, queued=0)
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fm1 HTTP/1.1" 200 -
+[2026-09-19 09:39:37] Scheduler start d7c37ff3 (active=1, queued=0)
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fm2 HTTP/1.1" 200 -
+[2026-09-19 09:39:37] Scheduler start 539fd252 (active=1, queued=0)
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fm3 HTTP/1.1" 200 -
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /status?id=66a25e0b HTTP/1.1" 200 -
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /status?id=2d5b605b HTTP/1.1" 200 -
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /status?id=d7c37ff3 HTTP/1.1" 200 -
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /status?id=539fd252 HTTP/1.1" 200 -
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+.[2026-09-19 09:39:37] Scheduler start 4f1cef6e (active=1, queued=0)
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fsolo HTTP/1.1" 200 -
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /status?id=4f1cef6e HTTP/1.1" 200 -
+.[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+.[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+.[2026-09-19 09:39:37] HTTP 127.0.0.1 "GET /nope HTTP/1.1" 404 -
+...................[2026-09-19 09:39:37] storage migrated to schema v2
+[2026-09-19 09:39:37] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:37] storage degraded: migration to v2 failed: file is not a database
+[2026-09-19 09:39:37] storage unavailable (C:\Users\ADMINI~1\AppData\Local\Temp\mediadock-restart-wteypuwb\tasks.db): migration failed: file is not a database; running without persistence
+[2026-09-19 09:39:37] storage disabled: running from memory only
+[2026-09-19 09:39:37] Scheduler start 90f78ad0 (active=1, queued=0)
+[2026-09-19 09:39:37] storage migrated to schema v2
+[2026-09-19 09:39:37] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+.[2026-09-19 09:39:37] storage migrated to schema v2
+[2026-09-19 09:39:37] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:37] storage migrated to schema v2
+[2026-09-19 09:39:37] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:37] storage migrated to schema v2
+[2026-09-19 09:39:37] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+.[2026-09-19 09:39:37] storage migrated to schema v2
+[2026-09-19 09:39:37] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:37] Scheduler start b8c64d08 (active=1, queued=0)
+[2026-09-19 09:39:38] task 2e2a15aa was downloading at shutdown -> error/interrupted
+[2026-09-19 09:39:38] storage ready: 3 task(s) loaded, 1 marked interrupted, 0 purged
+[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+.[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:38] Scheduler start c9035c97 (active=1, queued=0)
+[2026-09-19 09:39:38] storage ready: 1 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+.[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:38] task bf882997 was downloading at shutdown -> error/interrupted
+[2026-09-19 09:39:38] storage ready: 1 task(s) loaded, 1 marked interrupted, 0 purged
+[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+.[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:38] Scheduler start 6bf2026e (active=1, queued=0)
+[2026-09-19 09:39:38] storage ready: 1 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+.[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:38] storage ready: 1 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+.[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:38] task 4caf03e3 was pending at shutdown -> error/interrupted
+[2026-09-19 09:39:38] storage ready: 1 task(s) loaded, 1 marked interrupted, 0 purged
+[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+.[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:38] Scheduler start 84246a44 (active=1, queued=0)
+[2026-09-19 09:39:38] Scheduler start 14938a65 (active=1, queued=0)
+[2026-09-19 09:39:38] Scheduler start e0af75e9 (active=2, queued=0)
+[2026-09-19 09:39:38] storage ready: 3 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 09:39:38] storage migrated to schema v2
+[2026-09-19 09:39:38] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+..................................
 ----------------------------------------------------------------------
-Ran 128 tests in 8.442s
+Ran 172 tests in 11.268s
 
 OK
 UNITTEST_OK 

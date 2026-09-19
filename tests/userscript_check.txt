@@ -1,2 +1,2 @@
-JS STRUCTURE OK (461 lines, 13541 code chars, no backticks, anchors present)
+JS STRUCTURE OK (472 lines, 13809 code chars, no backticks, anchors present)
 CHECK_JS_OK 

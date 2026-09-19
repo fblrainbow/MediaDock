@@ -1,0 +1,36 @@
+{
+  "db": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-persist-ts4dt1dy\\tasks.db",
+  "base": "http://127.0.0.1:55897",
+  "bind": "127.0.0.1",
+  "schema_version": 2,
+  "engine_stub": "scripted process (spawn replaced)",
+  "commands_checked": 2,
+  "checks": {
+    "completed_via_real_chain": true,
+    "pause_ok": true,
+    "completed_survived": true,
+    "completed_at_survived": true,
+    "completion_order_survived": true,
+    "paused_survived": true,
+    "downloading_became_interrupted": true,
+    "pending_became_interrupted": true,
+    "order_stable": true,
+    "interrupted_not_faked": true,
+    "no_fake_active": true,
+    "history_ok": true,
+    "restart_event_ok": true,
+    "backup_written": true,
+    "corrupt_degrades_to_memory": true,
+    "download_works_after_degrade": true,
+    "records_after_reopen": true
+  },
+  "task_ids": {
+    "completed": "925d35ef",
+    "paused": "d780e7dd",
+    "interrupted_downloading": "98e1a639",
+    "interrupted_pending": "d70696af"
+  },
+  "history_total": 3,
+  "backup": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-persist-ts4dt1dy\\tasks.db.bak",
+  "failed_checks": []
+}

@@ -22,10 +22,14 @@ stable sort deterministic without extra comparison helpers.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Optional
 
 COMPLETED = "completed"
 LIVE_PROGRESS_STATUSES = ("downloading",)
+# Stage-005: a Task is history once it can no longer change without /retry.
+HISTORY_STATUSES = ("completed", "error", "cancelled")
+HISTORY_DEFAULT_LIMIT = 20
+HISTORY_MAX_LIMIT = 200
 
 
 def _percent(task: Dict[str, Any]) -> float:
@@ -80,4 +84,44 @@ def build_task_list(manager, scheduler) -> Dict[str, Any]:
     tasks = [dict(task) for task in stored.values()]
     payload: Dict[str, Any] = {"tasks": sort_tasks(tasks)}
     payload.update(scheduler.summary())
+    return payload
+
+
+def sort_history(tasks: Iterable[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Terminal tasks, newest completion first (Stage-005.md 5.4)."""
+    terminal = [task for task in tasks
+                if isinstance(task, dict)
+                and task.get("status") in HISTORY_STATUSES]
+    terminal.sort(key=lambda t: _text(t, "task_id"))
+    terminal.sort(key=lambda t: _completion_order(t), reverse=True)
+    terminal.sort(key=lambda t: _text(t, "completed_at"), reverse=True)
+    return terminal
+
+
+def normalize_limit(value: Any, default: int = HISTORY_DEFAULT_LIMIT,
+                    maximum: int = HISTORY_MAX_LIMIT):
+    """Return `(limit, None)` or `(None, error_message)`."""
+    if value is None or value == "":
+        return default, None
+    try:
+        limit = int(str(value).strip())
+    except (TypeError, ValueError):
+        return None, "limit must be an integer"
+    if limit < 1 or limit > maximum:
+        return None, f"limit must be between 1 and {maximum}"
+    return limit, None
+
+
+def build_history(manager, limit: int = HISTORY_DEFAULT_LIMIT,
+                  status: Optional[str] = None,
+                  storage: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    """Payload for `GET /history`: terminal tasks plus counts."""
+    ordered = sort_history(manager.all().values())
+    if status:
+        ordered = [task for task in ordered if task.get("status") == status]
+    total = len(ordered)
+    payload: Dict[str, Any] = {"tasks": ordered[:limit], "total": total,
+                               "returned": min(total, limit), "limit": limit}
+    if storage is not None:
+        payload["storage"] = storage
     return payload

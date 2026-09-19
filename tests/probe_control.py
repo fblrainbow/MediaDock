@@ -31,6 +31,9 @@ import urllib.parse
 import urllib.request
 from http.server import ThreadingHTTPServer
 
+# 探针不写真实数据库（Stage-005）
+os.environ.setdefault("MEDIADOCK_DB", ":memory:")
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import server as srv
 from core_engine import DownloadEngine

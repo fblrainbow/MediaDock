@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         MediaDock - Local YouTube Downloader
 // @namespace    http://tampermonkey.net/
-// @version      4.0
-// @description  一键调用本地 yt-dlp 下载 YouTube 视频，并显示所有页共享的多任务进度列表 (MediaDock Stage-004)
+// @version      5.0
+// @description  一键调用本地 yt-dlp 下载 YouTube 视频，并显示所有页共享的多任务进度列表 (MediaDock Stage-005)
 // @match        https://www.youtube.com/watch*
 // @match        https://www.youtube.com/shorts/*
 // @grant        GM_xmlhttpRequest
@@ -22,12 +22,17 @@
     // 已完成任务展开后的渲染上限，超出时明确提示而不是静默吞掉
     const MAX_COMPLETED_ROWS = 100;
     const SHORT_TITLE = 20;
-    // 控制接口路径 (Stage-004)：与服务端 POST 路由一一对应
+    // 控制接口路径 (Stage-004/005)：与服务端 POST 路由一一对应
     const CONTROL_PATHS = {
         pause: '/pause',
         resume: '/resume',
         cancel: '/cancel',
-        retry: '/retry'
+        retry: '/retry',
+        delete: '/delete'
+    };
+    // 错误码到中文提示 (Stage-005)：不改变服务端原始 error_code 语义
+    const ERROR_HINTS = {
+        interrupted: '服务重启中断'
     };
     // URL 归一化 (借鉴多合一脚本 cleanUrl)
     function cleanYouTubeUrl(raw) {
@@ -186,7 +191,9 @@
         if (task.status === 'cancelled') return '🚫 ' + title + ' · 已取消';
         if (task.status === 'completed') return '✅ ' + title + ' · 完成';
         if (task.status === 'error') {
-            const code = task.error_code ? ' (' + task.error_code + ')' : '';
+            const code = task.error_code
+                ? ' (' + (ERROR_HINTS[task.error_code] || task.error_code) + ')'
+                : '';
             return '❌ ' + title + ' · 失败' + code;
         }
         return '• ' + title + ' · ' + String(task.status || '');
@@ -204,7 +211,11 @@
             return [{ action: 'cancel', label: '取消' }];
         }
         if (status === 'error' || status === 'cancelled') {
-            return [{ action: 'retry', label: '重试' }];
+            return [{ action: 'retry', label: '重试' },
+                    { action: 'delete', label: '删除' }];
+        }
+        if (status === 'completed') {
+            return [{ action: 'delete', label: '删除' }];
         }
         return [];
     }

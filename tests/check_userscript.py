@@ -81,13 +81,14 @@ def main():
         raise SystemExit(f"FAIL: unclosed {stack}")
 
     required = [
-        "@version      4.0",
+        "@version      5.0",
         "'/tasks'",
         "'/download?url='",
         "'/pause'",
         "'/resume'",
         "'/cancel'",
         "'/retry'",
+        "'/delete'",
         "data-task-id",
         "data-control",
         "MAX_VISIBLE_ROWS = 20",
@@ -101,8 +102,10 @@ def main():
         "继续",
         "取消",
         "重试",
+        "删除",
         "已暂停",
         "已取消",
+        "ERROR_HINTS",
     ]
     missing = [needle for needle in required if needle not in src]
     if missing:

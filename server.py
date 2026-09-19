@@ -9,10 +9,13 @@ from urllib.parse import urlparse, parse_qs
 
 from core_control import ControlError
 from core_engine import DownloadEngine
-from core_listing import build_task_list
+from core_listing import (build_history, build_task_list, normalize_limit,
+                          HISTORY_DEFAULT_LIMIT, HISTORY_STATUSES)
 from core_manager import TaskManager
 from core_parse import MERGE_RE, PROGRESS_RE
 from core_scheduler import MAX_ACTIVE_TASKS, Scheduler
+from core_store import (PURGE_KEEP_DEFAULT, TaskPersister, open_store,
+                        resolve_db_path)
 from core_task import Task
 
 # =========================
@@ -60,11 +63,20 @@ def resolve_ytdlp():
 YT_DLP = resolve_ytdlp()
 
 # =========================
-# Task Manager (Stage-002: 唯一状态写入口)
+# Stage-005: 存储 + Task Manager + Scheduler 由 bootstrap() 统一装配
 # =========================
-manager = TaskManager()
-tasks = manager._tasks
-tasks_lock = manager._lock
+INTERRUPTED_CODE = "interrupted"
+INTERRUPTED_MESSAGE = ("service restarted before the task finished; "
+                       "it was not resumed automatically")
+RESTART_ERROR_STATUSES = ("downloading", "pending")
+
+manager = None
+scheduler = None
+storage = None
+storage_reason = ""
+tasks = {}
+tasks_lock = None
+DB_PATH = resolve_db_path(None)
 
 # =========================
 # Scheduler (Stage-003: 活动槽位 + FIFO 等待队列的唯一决策点)
@@ -75,8 +87,79 @@ def _make_engine():
                           logger=log)
 
 
-scheduler = Scheduler(manager, _make_engine, max_active=MAX_ACTIVE_TASKS,
-                      logger=log, download_dir=DOWNLOAD_DIR)
+scheduler = None
+
+
+def _apply_restart_matrix(store, task_manager):
+    """Restart rules (Stage-005.md 5.3). Returns the interrupted task ids.
+
+    `downloading` and `pending` cannot survive a restart: the process and the
+    queue are gone. They become `error` + `error_code=interrupted` instead of
+    pretending to still be running. `paused` stays paused; terminal records
+    load unchanged.
+    """
+    restored = store.load_tasks()
+    interrupted = []
+    for task_id, raw in restored.items():
+        data = dict(raw)
+        status = str(data.get("status") or "")
+        if status in RESTART_ERROR_STATUSES:
+            data["status"] = "error"
+            data["error_code"] = INTERRUPTED_CODE
+            data["error_message"] = INTERRUPTED_MESSAGE
+            data["completed_at"] = data.get("completed_at") or \
+                datetime.now().isoformat(timespec="seconds")
+            store.save_task(data)
+            store.record_event(task_id, "restart_interrupted", status)
+            interrupted.append(task_id)
+            log(f"task {task_id} was {status} at shutdown -> error/interrupted")
+        try:
+            task_manager.load_task(data)
+        except ValueError as exc:
+            log(f"skipped invalid persisted task {task_id}: {exc}")
+    return interrupted
+
+
+def storage_info():
+    """Payload for /health and /tasks (Stage-005.md 5.4)."""
+    if storage is None:
+        return {"kind": "memory", "db": DB_PATH, "schema_version": 0,
+                "degraded": bool(storage_reason), "reason": storage_reason}
+    info = storage.info()
+    if storage_reason:
+        info["reason"] = info.get("reason") or storage_reason
+    return info
+
+
+def bootstrap(db_path=None):
+    """(Re)build storage + manager + scheduler; safe to call again (tests)."""
+    global manager, scheduler, tasks, tasks_lock, storage, storage_reason
+    if storage is not None:
+        try:
+            storage.close()
+        except Exception:  # noqa: BLE001 - reopening must not fail on this
+            pass
+    store, reason = open_store(db_path, log)
+    storage = store
+    storage_reason = reason
+    persister = TaskPersister(store, log) if store is not None else None
+    manager = TaskManager(persister=persister)
+    interrupted = []
+    if store is not None:
+        interrupted = _apply_restart_matrix(store, manager)
+        purged = store.purge_terminal(PURGE_KEEP_DEFAULT)
+        log(f"storage ready: {len(manager.ids())} task(s) loaded, "
+            f"{len(interrupted)} marked interrupted, {purged} purged")
+    else:
+        log("storage disabled: running from memory only")
+    scheduler = Scheduler(manager, _make_engine, max_active=MAX_ACTIVE_TASKS,
+                          logger=log, download_dir=DOWNLOAD_DIR)
+    tasks = manager._tasks
+    tasks_lock = manager._lock
+    return manager, scheduler
+
+
+bootstrap()
 
 # =========================
 # 控制接口 (Stage-004)：POST /pause /resume /cancel /retry
@@ -111,6 +194,30 @@ def control_action(path, task_id):
     except Exception as exc:  # noqa: BLE001 - never leak a traceback to HTTP
         log(f"control {method_name} failed for {task_id}: {exc}")
         return _error("control_failed", str(exc), 500, task_id)
+
+
+# Stage-005：终态记录可由用户手动删除（D-017），运行中的任务不允许删
+DELETABLE_STATUSES = ("completed", "error", "cancelled")
+
+
+def delete_action(task_id):
+    """POST /delete：删除一条终态任务记录（内存 + 数据库）。"""
+    if not task_id:
+        return _error("missing_task_id", "Missing task_id", 400)
+    if not TASK_ID_RE.match(str(task_id)):
+        return _error("invalid_task_id",
+                      "task_id must be 1-64 chars of [A-Za-z0-9_-]", 400,
+                      task_id)
+    task = manager.get(str(task_id))
+    if task is None:
+        return _error("task_not_found", "task not found", 404, task_id)
+    if task.status not in DELETABLE_STATUSES:
+        return _error("not_deletable",
+                      f"task {task_id} is {task.status}; only finished tasks "
+                      f"can be deleted", 409, task_id)
+    manager.drop(str(task_id))
+    log(f"deleted task {task_id} ({task.status})")
+    return {"task_id": str(task_id), "deleted": True}, 200
 
 
 def _get(task_id):
@@ -204,13 +311,61 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urlparse(self.path)
-        # 健康检查 (plan.md #9)
+        # 健康检查 (plan.md #9 / Stage-005: 附存储状态)
         if parsed.path == "/health":
-            self._json({"status": "ok"})
+            self._json({"status": "ok", "storage": storage_info()})
             return
         # 共享任务列表：全量任务（契约排序）+ 调度器计数 (Stage-003)
         if parsed.path == "/tasks":
-            self._json(build_task_list(manager, scheduler))
+            payload = build_task_list(manager, scheduler)
+            payload["storage"] = storage_info()
+            self._json(payload)
+            return
+        # 历史查询 (Stage-005)：仅终态任务，按完成时间倒序
+        if parsed.path == "/history":
+            params = parse_qs(parsed.query)
+            limit, err = normalize_limit(params.get("limit", [None])[0])
+            if err:
+                body, code = _error("invalid_limit", err, 400)
+                self._json(body, code=code)
+                return
+            status = params.get("status", [None])[0]
+            if status and status not in HISTORY_STATUSES:
+                body, code = _error(
+                    "invalid_status",
+                    "status must be one of " + ", ".join(HISTORY_STATUSES), 400)
+                self._json(body, code=code)
+                return
+            self._json(build_history(manager, limit=limit, status=status,
+                                     storage=storage_info()))
+            return
+        # 状态事件流 (Stage-005)：未知任务且无事件 -> 404
+        if parsed.path == "/events":
+            params = parse_qs(parsed.query)
+            tid = params.get("id", [None])[0]
+            if not tid:
+                body, code = _error("missing_task_id", "Missing id", 400)
+                self._json(body, code=code)
+                return
+            if not TASK_ID_RE.match(str(tid)):
+                body, code = _error("invalid_task_id",
+                                    "task_id must be 1-64 chars of "
+                                    "[A-Za-z0-9_-]", 400, tid)
+                self._json(body, code=code)
+                return
+            limit, err = normalize_limit(params.get("limit", [None])[0],
+                                         default=50)
+            if err:
+                body, code = _error("invalid_limit", err, 400)
+                self._json(body, code=code)
+                return
+            events = storage.events(str(tid), limit) if storage is not None else []
+            if not events and manager.get(str(tid)) is None:
+                body, code = _error("task_not_found", "task not found", 404, tid)
+                self._json(body, code=code)
+                return
+            self._json({"task_id": str(tid), "events": events,
+                        "returned": len(events)})
             return
         # 查询下载进度：/status 全量 / /status?id=xxx 单任务 (plan.md #9)
         if parsed.path == "/status":
@@ -270,7 +425,10 @@ class Handler(BaseHTTPRequestHandler):
             body, code = _error("bad_request", "Body must be a JSON object", 400)
             self._json(body, code=code)
             return
-        body, code = control_action(parsed.path, payload.get("task_id"))
+        if parsed.path == "/delete":
+            body, code = delete_action(payload.get("task_id"))
+        else:
+            body, code = control_action(parsed.path, payload.get("task_id"))
         self._json(body, code=code)
 
     def do_OPTIONS(self):
@@ -308,6 +466,9 @@ def main():
     log(f"downloads: {DOWNLOAD_DIR}")
     log(f"yt-dlp: {YT_DLP}")
     log(f"max active downloads: {scheduler.active_limit}")
+    info = storage_info()
+    log(f"storage: {info['kind']} ({info.get('db')}) "
+        f"schema=v{info.get('schema_version')} degraded={info.get('degraded')}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
