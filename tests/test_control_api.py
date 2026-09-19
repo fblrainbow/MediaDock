@@ -84,7 +84,7 @@ class ControlApiBase(unittest.TestCase):
 
     def download(self, tag):
         code, body = http_json(self.base, f"/download?url=https%3A%2F%2F"
-                                           f"example.com%2F{tag}")
+                                           f"www.youtube.com%2Fwatch%3Fv%3D{tag}")
         self.assertEqual(code, 200, body)
         return body["task_id"]
 

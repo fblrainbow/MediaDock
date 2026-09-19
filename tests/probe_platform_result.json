@@ -1,0 +1,61 @@
+{
+  "base": "http://127.0.0.1:58030",
+  "bind": "127.0.0.1",
+  "port_mode": "ephemeral",
+  "engine_stub": "instant engine (process spawn replaced)",
+  "platforms": [
+    "youtube"
+  ],
+  "youtube_domains": [
+    "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "https://youtube.com/watch?v=dQw4w9WgXcQ",
+    "https://m.youtube.com/watch?v=dQw4w9WgXcQ",
+    "https://music.youtube.com/watch?v=dQw4w9WgXcQ",
+    "https://youtu.be/dQw4w9WgXcQ",
+    "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ",
+    "https://www.youtube.com/shorts/dQw4w9WgXcQ"
+  ],
+  "unsupported_results": [
+    {
+      "code": 400,
+      "error_code": "unsupported_platform"
+    },
+    {
+      "code": 400,
+      "error_code": "unsupported_platform"
+    },
+    {
+      "code": 400,
+      "error_code": "unsupported_platform"
+    },
+    {
+      "code": 400,
+      "error_code": "unsupported_platform"
+    },
+    {
+      "code": 400,
+      "error_code": "unsupported_platform"
+    }
+  ],
+  "checks": {
+    "server_has_no_platform_literal": true,
+    "server_uses_detector": true,
+    "registry_only_youtube": true,
+    "registry_default_is_youtube": true,
+    "youtube_domains_200": true,
+    "youtube_task_platform": true,
+    "fragment_stripped": true,
+    "unsupported_platform_400": true,
+    "unsupported_creates_no_task": true,
+    "unsupported_no_slot": true,
+    "missing_url_400": true,
+    "invalid_url_400": true,
+    "userinfo_rejected_400": true,
+    "status_shape_unchanged": true,
+    "task_reached_terminal": true,
+    "detect_has_no_side_effect": true,
+    "extension_point_visible": true,
+    "not_ready_rejected": true
+  },
+  "failed_checks": []
+}

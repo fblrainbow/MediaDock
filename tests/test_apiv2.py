@@ -69,7 +69,7 @@ class TestLiveApiV2(unittest.TestCase):
 
     def test_legacy_fields_present(self):
         code, body = self._get(
-            "/download?url=https%3A%2F%2Fexample.com%2Fv")
+            "/download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dlegacyv")
         self.assertEqual(code, 200)
         tid = json.loads(body.decode("utf-8"))["task_id"]
         try:

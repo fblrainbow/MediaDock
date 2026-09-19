@@ -205,11 +205,12 @@ def main():
             + urllib.parse.quote("--exec=calc", safe=""))
         checks["url_flag_injection_400"] = code == 400
 
-        # 5) 正常下载仍然可用（守卫不误伤）
+        # 5) 正常下载仍然可用（守卫不误伤，Stage-007 起用已接入的 YouTube URL）
         parsed = urllib.parse.urlparse(base)
         code, raw = raw_request(
             port, "/download?url="
-            + urllib.parse.quote("https://example.com/probe-ok", safe=""),
+            + urllib.parse.quote("https://www.youtube.com/watch?v=probeok",
+                                 safe=""),
             host=f"127.0.0.1:{parsed.port}")
         task_id = as_json(raw).get("task_id", "")
         checks["download_200"] = code == 200 and bool(task_id)
@@ -267,7 +268,8 @@ def main():
         and len(payload["config"]["errors"]) >= 2)
     code, raw = raw_request(
         port, "/download?url="
-        + urllib.parse.quote("https://example.com/after-bad-config", safe=""))
+        + urllib.parse.quote("https://www.youtube.com/watch?v=afterbadcfg",
+                             safe=""))
     fallback_id = as_json(raw).get("task_id", "")
     checks["service_after_bad_config"] = (
         code == 200 and wait_status(fallback_id, ("completed",)) == "completed")

@@ -184,7 +184,8 @@ class TestTasksApi(unittest.TestCase):
         try:
             for i in range(4):
                 code, body = self._get(
-                    f"/download?url=https%3A%2F%2Fexample.com%2Fm{i}")
+                    f"/download?url=https%3A%2F%2Fwww.youtube.com"
+                    f"%2Fwatch%3Fv%3Dm{i}")
                 self.assertEqual(code, 200)
                 ids.append(json.loads(body.decode("utf-8"))["task_id"])
             self.assertEqual(len(set(ids)), 4)
@@ -210,7 +211,8 @@ class TestTasksApi(unittest.TestCase):
                 drop_when_terminal(tid)
 
     def test_status_single_task_matches_tasks_list(self):
-        code, body = self._get("/download?url=https%3A%2F%2Fexample.com%2Fsolo")
+        code, body = self._get(
+            "/download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dsolo")
         self.assertEqual(code, 200)
         tid = json.loads(body.decode("utf-8"))["task_id"]
         try:

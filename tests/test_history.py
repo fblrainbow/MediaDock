@@ -63,7 +63,8 @@ class HistoryApiBase(unittest.TestCase):
 
     def download(self, tag):
         code, body = http_json(
-            self.base, f"/download?url=https%3A%2F%2Fexample.com%2F{tag}")
+            self.base,
+            f"/download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D{tag}")
         self.assertEqual(code, 200, body)
         task_id = body["task_id"]
         self.assertTrue(srv.scheduler.wait_idle(20))
@@ -152,7 +153,9 @@ class TestDeleteEndpoint(HistoryApiBase):
         factory = install_factory(lambda: CancelableEngine(hold_seconds=20.0))
         try:
             code, body = http_json(
-                self.base, "/download?url=https%3A%2F%2Fexample.com%2Frun")
+                self.base,
+                "/download?url=https%3A%2F%2Fwww.youtube.com"
+                "%2Fwatch%3Fv%3Drun")
             self.assertEqual(code, 200)
             task_id = body["task_id"]
             deadline = time.monotonic() + 10

@@ -182,7 +182,7 @@ class TestDownloadValidation(SecApiBase):
 
     def test_valid_url_still_downloads(self):
         """T627: hardening must not break the normal flow."""
-        url = quote("https://example.com/ok", safe="")
+        url = quote("https://www.youtube.com/watch?v=securl1", safe="")
         code, raw = self.get(f"/download?url={url}")
         self.assertEqual(code, 200, raw)
         task_id = json_body(raw)["task_id"]

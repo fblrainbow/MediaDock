@@ -189,6 +189,7 @@ cython_debug/
 config.json
 # Local scratch files used while developing/verifying
 _tmp_*
+_srv_*
 YouTube Ultimate Downloader v13.3.js
 多合一视频下载器【2026最新】- 支持 YouTube, TikTok, X(Twitter), Instagram, Facebook.js
 多合一视频下载器（支持：YouTube, TikTok, Instagram等）.js

@@ -15,9 +15,10 @@ from core_listing import (build_history, build_task_list, normalize_limit,
                           HISTORY_DEFAULT_LIMIT, HISTORY_STATUSES)
 from core_manager import TaskManager
 from core_parse import MERGE_RE, PROGRESS_RE
+from core_platform import detect_platform
 from core_scheduler import MAX_ACTIVE_TASKS, Scheduler
 from core_security import (body_within_limit, check_host_header, check_origin,
-                           clip, redact, validate_url)
+                           clip, redact)
 from core_store import (PURGE_KEEP_DEFAULT, TaskPersister, open_store,
                         resolve_db_path)
 from core_task import Task
@@ -514,13 +515,15 @@ class Handler(BaseHTTPRequestHandler):
                 body, code = _error("missing_url", "Missing url", 400)
                 self._json(body, code=code)
                 return
-            ok, code_name, message = validate_url(url)
-            if not ok:
+            # 平台检测 (Stage-007)：URL 校验 + Adapter 匹配只有一处真值
+            adapter, code_name, message = detect_platform(url)
+            if adapter is None:
                 body, code = _error(code_name, message, 400)
                 self._json(body, code=code)
                 return
-            # 创建 pending Task 后交给调度器：有空闲槽位就启动，否则 FIFO 排队
-            created = scheduler.submit(url)
+            # 归一化 URL 后创建 pending Task：有空闲槽位就启动，否则 FIFO 排队
+            info = adapter.info(url)
+            created = scheduler.submit(info.url, platform=info.name)
             self._json({"task_id": created["task_id"]})
             return
         # 其他路径
