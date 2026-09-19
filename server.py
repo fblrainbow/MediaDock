@@ -11,6 +11,10 @@ from core_config import (Config, config_public, load_config)
 from core_control import ControlError
 from core_deps import failed_checks, run_checks
 from core_engine import DownloadEngine, resolve_ffmpeg
+from core_formats import (DEFAULT_PRESET, ERROR_FORMAT_NOT_AVAILABLE,
+                          ERROR_INVALID_FORMAT, FormatsProbe,
+                          format_id_present, preset_satisfied, resolve_preset,
+                          selector_for, validate_format_id)
 from core_listing import (build_history, build_task_list, normalize_limit,
                           HISTORY_DEFAULT_LIMIT, HISTORY_STATUSES)
 from core_manager import TaskManager
@@ -41,6 +45,12 @@ LOG_FILE = os.path.join(BASE_DIR, "MediaDock-server.log")
 LOG_LEVEL = "info"
 LOG_MAX_LINE = 4000
 DEPENDENCIES = {}
+
+# Stage-008: formats probe seam + last-probed payloads per normalized URL.
+FORMATS_RUNNER = None
+FORMATS_PROBE_FACTORY = None
+FORMATS_CACHE = {}
+FORMATS_CACHE_LIMIT = 20
 
 _log_fp = None
 
@@ -215,6 +225,72 @@ def _apply_restart_matrix(store, task_manager):
     return interrupted
 
 
+def set_formats_probe(probe):
+    """Test/harness seam: replace how the formats probe is built."""
+    global FORMATS_PROBE_FACTORY
+    FORMATS_PROBE_FACTORY = probe
+    clear_formats_cache()
+
+
+def formats_probe():
+    """Current formats probe (Stage-008); `FORMATS_RUNNER` injects the runner."""
+    if FORMATS_PROBE_FACTORY is not None:
+        return FORMATS_PROBE_FACTORY()
+    return FormatsProbe(YT_DLP, FFMPEG, runner=FORMATS_RUNNER, logger=log)
+
+
+def clear_formats_cache():
+    FORMATS_CACHE.clear()
+
+
+def cache_formats(url, payload):
+    """Remember the last `/formats` payload per URL (bounded FIFO)."""
+    key = str(url or "")
+    if not key or not isinstance(payload, dict):
+        return
+    FORMATS_CACHE.pop(key, None)
+    FORMATS_CACHE[key] = payload
+    while len(FORMATS_CACHE) > FORMATS_CACHE_LIMIT:
+        FORMATS_CACHE.pop(next(iter(FORMATS_CACHE)), None)
+
+
+def cached_formats(url):
+    return FORMATS_CACHE.get(str(url or ""))
+
+
+def resolve_format_choice(url, preset_raw, format_id_raw):
+    """`(expression, error_code, message)`; never returns unvalidated input.
+
+    A non-default preset or an explicit `format_id` must match something a
+    previous `/formats` call really reported for this URL, so no arbitrary text
+    can reach the yt-dlp argv (Stage-008.md 5.4).
+    """
+    preset, code, message = resolve_preset(preset_raw)
+    if preset is None:
+        return "", code, message
+    format_id = str(format_id_raw or "").strip()
+    cached = cached_formats(url)
+    formats = list(cached.get("formats") or []) if cached else []
+    if format_id:
+        ok, message = validate_format_id(format_id)
+        if not ok:
+            return "", ERROR_INVALID_FORMAT, message
+        if not format_id_present(format_id, formats):
+            return "", ERROR_FORMAT_NOT_AVAILABLE, (
+                "format_id is not available for this video; "
+                "call /formats first")
+        return selector_for(None, format_id), "", ""
+    if preset.name == DEFAULT_PRESET:
+        return selector_for(preset), "", ""
+    if not cached:
+        return "", ERROR_FORMAT_NOT_AVAILABLE, (
+            "call /formats before choosing a preset")
+    if not preset_satisfied(preset, formats):
+        return "", ERROR_FORMAT_NOT_AVAILABLE, (
+            f"preset {preset.name} is not available for this video")
+    return selector_for(preset), "", ""
+
+
 def storage_info():
     """Payload for /health and /tasks (Stage-005.md 5.4)."""
     if storage is None:
@@ -236,6 +312,7 @@ def bootstrap(db_path=None, config=None):
     global DB_PATH
     if config is not None:
         apply_config(config)
+    clear_formats_cache()
     if storage is not None:
         try:
             storage.close()
@@ -507,6 +584,31 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._json(_all())
             return
+        # 格式查询 (Stage-008)：先过平台检测，只对已接入平台查询 yt-dlp
+        if parsed.path == "/formats":
+            params = parse_qs(parsed.query)
+            url = params.get("url", [None])[0]
+            if not url:
+                body, code = _error("missing_url", "Missing url", 400)
+                self._json(body, code=code)
+                return
+            adapter, code_name, message = detect_platform(url)
+            if adapter is None:
+                body, code = _error(code_name, message,
+                                    400 if code_name != "formats_unavailable"
+                                    else 502)
+                self._json(body, code=code)
+                return
+            info = adapter.info(url)
+            payload, code_name, message = formats_probe().fetch(
+                info.url, info.name, info.video_id)
+            if payload is None:
+                body, code = _error(code_name, message, 502)
+                self._json(body, code=code)
+                return
+            cache_formats(info.url, payload)
+            self._json(payload)
+            return
         # 开始下载
         if parsed.path == "/download":
             params = parse_qs(parsed.query)
@@ -521,9 +623,18 @@ class Handler(BaseHTTPRequestHandler):
                 body, code = _error(code_name, message, 400)
                 self._json(body, code=code)
                 return
-            # 归一化 URL 后创建 pending Task：有空闲槽位就启动，否则 FIFO 排队
             info = adapter.info(url)
-            created = scheduler.submit(info.url, platform=info.name)
+            # 格式选择 (Stage-008)：preset / format_id 必须来自固定表或 /formats 结果
+            expression, code_name, message = resolve_format_choice(
+                info.url, params.get("preset", [None])[0],
+                params.get("format_id", [None])[0])
+            if code_name:
+                body, code = _error(code_name, message, 400)
+                self._json(body, code=code)
+                return
+            # 归一化 URL 后创建 pending Task：有空闲槽位就启动，否则 FIFO 排队
+            created = scheduler.submit(info.url, platform=info.name,
+                                       format_expr=expression)
             self._json({"task_id": created["task_id"]})
             return
         # 其他路径

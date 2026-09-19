@@ -73,6 +73,7 @@ class Scheduler:
         self._active: Dict[str, str] = {}
         self._queue: List[str] = []
         self._urls: Dict[str, str] = {}
+        self._formats: Dict[str, str] = {}
         self._started: set = set()
         self._finished: set = set()
         self._controls = control_registry or ControlRegistry(self._log)
@@ -90,21 +91,27 @@ class Scheduler:
             self._engine_factory = engine_factory
 
     # -- submission --------------------------------------------------
-    def submit(self, url: str, platform: str = "youtube") -> Dict[str, Any]:
+    def submit(self, url: str, platform: str = "youtube",
+               format_expr: str = "") -> Dict[str, Any]:
         """Create a Task, then start it now or park it in the FIFO queue.
 
-        The Task is stored before any start decision, so the caller can
-        always query the returned `task_id` immediately.
+        `format_expr` is the resolved yt-dlp `-f` expression (Stage-008); it is
+        kept in the scheduler's send-time record, not in the Task, so the Task
+        field/schema contract is unchanged. The Task is stored before any start
+        decision, so the caller can always query the returned `task_id`.
         """
         task = self.manager.create(url, platform)
-        self.admit(task.task_id, url)
+        self.admit(task.task_id, url, format_expr)
         snapshot = self.manager.get(task.task_id)
         return snapshot.to_dict() if snapshot else task.to_dict()
 
-    def admit(self, task_id: str, url: str) -> bool:
+    def admit(self, task_id: str, url: str, format_expr: str = "") -> bool:
         """Atomically decide start-now vs queue for an already stored Task."""
         with self._lock:
             self._urls[task_id] = url
+            expression = str(format_expr or "").strip()
+            if expression:
+                self._formats[task_id] = expression
             if len(self._active) < self._max_active:
                 return self._start_locked(task_id)
             if task_id not in self._queue:
@@ -112,6 +119,11 @@ class Scheduler:
             self._log(f"Scheduler queued {task_id} "
                       f"(active={len(self._active)}, queued={len(self._queue)})")
             return False
+
+    def format_for(self, task_id: str) -> str:
+        """`-f` expression recorded for this task (empty = default policy)."""
+        with self._lock:
+            return self._formats.get(task_id, "")
 
     def _start_locked(self, task_id: str) -> bool:
         if task_id in self._started or task_id in self._finished:
@@ -133,6 +145,7 @@ class Scheduler:
         try:
             engine = self._engine_factory()
             control = self._controls.get_or_create(task_id)
+            control.format_expr = self.format_for(task_id)
             engine.run(task_id, url, control)
         except Exception as exc:  # noqa: BLE001 - a slot must never leak
             self._fail(task_id, "scheduler_error", str(exc))

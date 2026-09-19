@@ -89,11 +89,17 @@ def terminate_tree(process: Any,
 
 
 class TaskControl:
-    """Pause/cancel intent, process handle and artifact list for one Task."""
+    """Pause/cancel intent, process handle and artifact list for one Task.
+
+    Stage-008 adds `format_expr`: the resolved yt-dlp `-f` expression for this
+    run. The Scheduler sets it from its own send-time record, so the engine
+    never has to trust a raw HTTP value and stub engines may ignore it.
+    """
 
     def __init__(self, task_id: str,
                  logger: Optional[Callable[..., None]] = None):
         self.task_id = task_id
+        self.format_expr = ""
         self._lock = threading.RLock()
         self._pause = False
         self._cancel = False

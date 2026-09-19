@@ -1,394 +1,471 @@
-﻿[2026-09-19 10:13:33] storage migrated to schema v2
-[2026-09-19 10:13:33] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
-[2026-09-19 10:13:33] Scheduler start 56f8c796 (active=1, queued=0)
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dlegacyv HTTP/1.1" 200 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /status?id=56f8c796 HTTP/1.1" 200 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /nope HTTP/1.1" 404 -
-[2026-09-19 10:13:33] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
-[2026-09-19 10:13:34] storage migrated to schema v2
-[2026-09-19 10:13:34] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:34] storage migrated to schema v2
-[2026-09-19 10:13:34] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:34] storage migrated to schema v2
-[2026-09-19 10:13:34] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:34] storage migrated to schema v2
-[2026-09-19 10:13:34] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-[2026-09-19 10:13:38] Scheduler start ec04a3d2 (active=1, queued=0)
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnc1 HTTP/1.1" 200 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 409 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-[2026-09-19 10:13:38] Scheduler start 0c08e0be (active=1, queued=0)
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnp0 HTTP/1.1" 200 -
-[2026-09-19 10:13:38] Scheduler start ebae22ce (active=2, queued=0)
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnp1 HTTP/1.1" 200 -
-[2026-09-19 10:13:38] Scheduler start 0db4ea9d (active=3, queued=0)
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnp2 HTTP/1.1" 200 -
-[2026-09-19 10:13:38] Scheduler queued 3293a8fe (active=3, queued=1)
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnp3 HTTP/1.1" 200 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 409 -
-[2026-09-19 10:13:38] Scheduler start 3293a8fe (active=3, queued=0)
-[2026-09-19 10:13:38] Scheduler start b13c3529 (active=1, queued=0)
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnr1 HTTP/1.1" 200 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /resume HTTP/1.1" 409 -
-[2026-09-19 10:13:38] Scheduler start 28ce06ee (active=1, queued=0)
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dny1 HTTP/1.1" 200 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /retry HTTP/1.1" 409 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /purge HTTP/1.1" 404 -
-[2026-09-19 10:13:38] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 404 -
-[2026-09-19 10:13:39] Scheduler start bfdeece6 (active=1, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dcancel1 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start 13f49154 (active=1, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dq0 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start fc9bc33e (active=2, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dq1 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start 63e42480 (active=3, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dq2 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler queued c2eac380 (active=3, queued=1)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dq3 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler skipped cleanup for c2eac380: no started_at
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start a1e6929f (active=1, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Diso1 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start 029ca7bb (active=2, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Diso2 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "OPTIONS /pause HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start ce4f7657 (active=1, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Ds0 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start 1ca9be26 (active=2, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Ds1 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start 57c9b809 (active=3, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Ds2 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler queued fff7f862 (active=3, queued=1)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Ds3 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start fff7f862 (active=3, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start 1b917392 (active=1, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dpause1 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start 1b917392 (active=1, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "POST /resume HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start c1c82b6b (active=1, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dretry1 HTTP/1.1" 200 -
-[2026-09-19 10:13:39] Scheduler start c1c82b6b (active=1, queued=0)
-[2026-09-19 10:13:39] HTTP 127.0.0.1 "POST /retry HTTP/1.1" 200 -
-[2026-09-19 10:13:40] storage migrated to schema v2
-[2026-09-19 10:13:40] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:40] Scheduler start 30138e82 (active=1, queued=0)
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dd1 HTTP/1.1" 200 -
-[2026-09-19 10:13:40] deleted task 30138e82 (completed)
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 200 -
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "GET /status?id=30138e82 HTTP/1.1" 404 -
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
-[2026-09-19 10:13:40] storage migrated to schema v2
-[2026-09-19 10:13:40] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:40] Scheduler start b08d49ac (active=1, queued=0)
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Drun HTTP/1.1" 200 -
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 409 -
-[2026-09-19 10:13:40] storage migrated to schema v2
-[2026-09-19 10:13:40] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 404 -
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 400 -
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 400 -
-[2026-09-19 10:13:40] storage migrated to schema v2
-[2026-09-19 10:13:40] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-[2026-09-19 10:13:40] storage migrated to schema v2
-[2026-09-19 10:13:40] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-[2026-09-19 10:13:40] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
-[2026-09-19 10:13:41] storage migrated to schema v2
-[2026-09-19 10:13:41] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:41] Scheduler start 61d1b8ae (active=1, queued=0)
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3De1 HTTP/1.1" 200 -
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /events?id=61d1b8ae HTTP/1.1" 200 -
-[2026-09-19 10:13:41] storage migrated to schema v2
-[2026-09-19 10:13:41] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /events HTTP/1.1" 400 -
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /events?id=../etc/passwd HTTP/1.1" 400 -
-[2026-09-19 10:13:41] storage migrated to schema v2
-[2026-09-19 10:13:41] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /events?id=no-such-task HTTP/1.1" 404 -
-[2026-09-19 10:13:41] storage migrated to schema v2
-[2026-09-19 10:13:41] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
-[2026-09-19 10:13:41] storage migrated to schema v2
-[2026-09-19 10:13:41] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:41] Scheduler start e3122067 (active=1, queued=0)
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dh1 HTTP/1.1" 200 -
-[2026-09-19 10:13:41] Scheduler start 68efe0b3 (active=1, queued=0)
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dh2 HTTP/1.1" 200 -
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
-[2026-09-19 10:13:41] storage migrated to schema v2
-[2026-09-19 10:13:41] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:41] Scheduler start e9396f43 (active=1, queued=0)
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dh3 HTTP/1.1" 200 -
-[2026-09-19 10:13:41] Scheduler start d20c1057 (active=1, queued=0)
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dh4 HTTP/1.1" 200 -
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /history?limit=1 HTTP/1.1" 200 -
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /history?status=completed HTTP/1.1" 200 -
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /history?status=error HTTP/1.1" 200 -
-[2026-09-19 10:13:41] storage migrated to schema v2
-[2026-09-19 10:13:41] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /history?limit=0 HTTP/1.1" 400 -
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /history?limit=abc HTTP/1.1" 400 -
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /history?limit=500 HTTP/1.1" 400 -
-[2026-09-19 10:13:41] HTTP 127.0.0.1 "GET /history?status=downloading HTTP/1.1" 400 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
-[2026-09-19 10:13:42] Scheduler start a4a5fcb8 (active=1, queued=0)
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dm0 HTTP/1.1" 200 -
-[2026-09-19 10:13:42] Scheduler start 350f8379 (active=1, queued=0)
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dm1 HTTP/1.1" 200 -
-[2026-09-19 10:13:42] Scheduler start 686d5a9b (active=1, queued=0)
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dm2 HTTP/1.1" 200 -
-[2026-09-19 10:13:42] Scheduler start d844d912 (active=1, queued=0)
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dm3 HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /status?id=a4a5fcb8 HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /status?id=350f8379 HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /status?id=686d5a9b HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /status?id=d844d912 HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-[2026-09-19 10:13:42] Scheduler start 7ad12218 (active=1, queued=0)
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dsolo HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /status?id=7ad12218 HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
-[2026-09-19 10:13:42] HTTP 127.0.0.1 "GET /nope HTTP/1.1" 404 -
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] Scheduler start b38c1e58 (active=1, queued=0)
-[2026-09-19 10:13:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ%23t%3D42 HTTP/1.1" 200 -
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
-[2026-09-19 10:13:43] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fyoutube.com%2Fwatch%3Fv%3Dabc123456 HTTP/1.1" 400 -
-[2026-09-19 10:13:43] HTTP 127.0.0.1 "GET /download?url=--exec%3Dcalc HTTP/1.1" 400 -
-[2026-09-19 10:13:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fuser%3Apw%40youtube.com%2Fv HTTP/1.1" 400 -
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.tiktok.com%2F%40a%2Fvideo%2F1 HTTP/1.1" 400 -
-[2026-09-19 10:13:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fx.com%2Fa%2Fstatus%2F1 HTTP/1.1" 400 -
-[2026-09-19 10:13:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fv.mp4 HTTP/1.1" 400 -
-[2026-09-19 10:13:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1 HTTP/1.1" 400 -
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] Scheduler start 1d804c7a (active=1, queued=0)
-[2026-09-19 10:13:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fyoutu.be%2FdQw4w9WgXcQ HTTP/1.1" 200 -
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage degraded: migration to v2 failed: file is not a database
-[2026-09-19 10:13:43] storage unavailable (C:\Users\ADMINI~1\AppData\Local\Temp\mediadock-restart-d5k0_9t0\tasks.db): migration failed: file is not a database; running without persistence
-[2026-09-19 10:13:43] storage disabled: running from memory only
-[2026-09-19 10:13:43] Scheduler start 0cfe96d4 (active=1, queued=0)
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] Scheduler start 6b535c36 (active=1, queued=0)
-[2026-09-19 10:13:43] task 7fc59318 was downloading at shutdown -> error/interrupted
-[2026-09-19 10:13:43] storage ready: 3 task(s) loaded, 1 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] Scheduler start efd3cdd0 (active=1, queued=0)
-[2026-09-19 10:13:43] storage ready: 1 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:43] storage migrated to schema v2
-[2026-09-19 10:13:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] task eb9463cd was downloading at shutdown -> error/interrupted
-[2026-09-19 10:13:44] storage ready: 1 task(s) loaded, 1 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] Scheduler start 5555c63c (active=1, queued=0)
-[2026-09-19 10:13:44] storage ready: 1 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage ready: 1 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] task 7b9d1bae was pending at shutdown -> error/interrupted
-[2026-09-19 10:13:44] storage ready: 1 task(s) loaded, 1 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] Scheduler start 2c8b49d0 (active=1, queued=0)
-[2026-09-19 10:13:44] Scheduler start cdacc045 (active=1, queued=0)
-[2026-09-19 10:13:44] Scheduler start c3a2f63e (active=2, queued=0)
-[2026-09-19 10:13:44] storage ready: 3 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:44] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 413 -
-[2026-09-19 10:13:44] storage migrated to schema v2
-[2026-09-19 10:13:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fa%09b HTTP/1.1" 400 -
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Faaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa HTTP/1.1" 400 -
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] HTTP 127.0.0.1 "GET /download?url=javascript%3Aalert%281%29 HTTP/1.1" 400 -
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] Scheduler start 01412e57 (active=1, queued=0)
-[2026-09-19 10:13:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dsecurl1 HTTP/1.1" 200 -
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:45] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:45] storage migrated to schema v2
-[2026-09-19 10:13:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] request rejected: Host evil.com is not a loopback address
-[2026-09-19 10:13:46] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
-[2026-09-19 10:13:46] request rejected: Host evil.com is not a loopback address
-[2026-09-19 10:13:46] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
-[2026-09-19 10:13:46] request rejected: Host 0.0.0.0 is not a loopback address
-[2026-09-19 10:13:46] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
-[2026-09-19 10:13:46] request rejected: Host 192.168.1.10 is not a loopback address
-[2026-09-19 10:13:46] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] request rejected: Host evil.com is not a loopback address
-[2026-09-19 10:13:46] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 403 -
-[2026-09-19 10:13:46] request rejected: Host evil.com is not a loopback address
-[2026-09-19 10:13:46] HTTP 127.0.0.1 "OPTIONS /pause HTTP/1.1" 403 -
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:46] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:46] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:46] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] INFO-AFTER-DEBUG
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] WARN-LEVEL-MARKER
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] LONG-MARKER-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:46] probe url https://example.com/v?token=***&v=abc under ~\Videos\clip.mp4
-[2026-09-19 10:13:46] storage migrated to schema v2
-[2026-09-19 10:13:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:47] storage migrated to schema v2
-[2026-09-19 10:13:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:47] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:47] storage migrated to schema v2
-[2026-09-19 10:13:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:47] storage migrated to schema v2
-[2026-09-19 10:13:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:47] request rejected: Origin host evil.com is not a YouTube domain
-[2026-09-19 10:13:47] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
-[2026-09-19 10:13:47] request rejected: Origin null is not allowed
-[2026-09-19 10:13:47] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
-[2026-09-19 10:13:47] request rejected: Origin * is not allowed
-[2026-09-19 10:13:47] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
-[2026-09-19 10:13:47] request rejected: malformed Origin (chrome-extension://abcdef)
-[2026-09-19 10:13:47] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
-[2026-09-19 10:13:47] storage migrated to schema v2
-[2026-09-19 10:13:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:47] storage migrated to schema v2
-[2026-09-19 10:13:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:47] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
-[2026-09-19 10:13:47] storage migrated to schema v2
-[2026-09-19 10:13:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:47] storage migrated to schema v2
-[2026-09-19 10:13:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
-[2026-09-19 10:13:47] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:47] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:47] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
-[2026-09-19 10:13:47] storage migrated to schema v2
-[2026-09-19 10:13:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+﻿[2026-09-19 10:31:36] storage migrated to schema v2
+[2026-09-19 10:31:36] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fexample.com%2Fx HTTP/1.1" 400 -
+[2026-09-19 10:31:36] Scheduler start 51d359dc (active=1, queued=0)
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dlegacyv HTTP/1.1" 200 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /status?id=51d359dc HTTP/1.1" 200 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /nope HTTP/1.1" 404 -
+[2026-09-19 10:31:36] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
+[2026-09-19 10:31:37] storage migrated to schema v2
+[2026-09-19 10:31:37] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:37] storage migrated to schema v2
+[2026-09-19 10:31:37] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:37] storage migrated to schema v2
+[2026-09-19 10:31:37] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:37] storage migrated to schema v2
+[2026-09-19 10:31:37] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+[2026-09-19 10:31:41] Scheduler start 5f18b03d (active=1, queued=0)
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnc1 HTTP/1.1" 200 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 409 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+[2026-09-19 10:31:41] Scheduler start 1c894e8a (active=1, queued=0)
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnp0 HTTP/1.1" 200 -
+[2026-09-19 10:31:41] Scheduler start 674878e3 (active=2, queued=0)
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnp1 HTTP/1.1" 200 -
+[2026-09-19 10:31:41] Scheduler start e1d92d35 (active=3, queued=0)
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnp2 HTTP/1.1" 200 -
+[2026-09-19 10:31:41] Scheduler queued 9d061124 (active=3, queued=1)
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnp3 HTTP/1.1" 200 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 409 -
+[2026-09-19 10:31:41] Scheduler start 9d061124 (active=3, queued=0)
+[2026-09-19 10:31:41] Scheduler start bd1df818 (active=1, queued=0)
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dnr1 HTTP/1.1" 200 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /resume HTTP/1.1" 409 -
+[2026-09-19 10:31:41] Scheduler start dc018963 (active=1, queued=0)
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dny1 HTTP/1.1" 200 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /retry HTTP/1.1" 409 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /purge HTTP/1.1" 404 -
+[2026-09-19 10:31:41] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 404 -
+[2026-09-19 10:31:42] Scheduler start 7a4dbf57 (active=1, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dcancel1 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 09910a29 (active=1, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dq0 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start e1e2ecf5 (active=2, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dq1 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 93a8d37b (active=3, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dq2 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler queued 7718d40d (active=3, queued=1)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dq3 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler skipped cleanup for 7718d40d: no started_at
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "POST /cancel HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 25f2bbde (active=1, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Diso1 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 4ca88424 (active=2, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Diso2 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "OPTIONS /pause HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 3deecc60 (active=1, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Ds0 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start d74f1723 (active=2, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Ds1 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 52ed8c77 (active=3, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Ds2 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler queued 32f9d793 (active=3, queued=1)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Ds3 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 32f9d793 (active=3, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 2150b09f (active=1, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dpause1 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 2150b09f (active=1, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "POST /resume HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 64fd5e44 (active=1, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dretry1 HTTP/1.1" 200 -
+[2026-09-19 10:31:42] Scheduler start 64fd5e44 (active=1, queued=0)
+[2026-09-19 10:31:42] HTTP 127.0.0.1 "POST /retry HTTP/1.1" 200 -
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] Scheduler start c774391f (active=1, queued=0)
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ HTTP/1.1" 200 -
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&format_id=137 HTTP/1.1" 400 -
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&format_id=--exec%3Dcalc HTTP/1.1" 400 -
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&format_id=-f HTTP/1.1" 400 -
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&format_id=a%20b HTTP/1.1" 400 -
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&format_id=a%3Bb HTTP/1.1" 400 -
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /formats?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ HTTP/1.1" 200 -
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&format_id=999 HTTP/1.1" 400 -
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /formats?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ HTTP/1.1" 200 -
+[2026-09-19 10:31:43] Scheduler start c924bbbb (active=1, queued=0)
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&format_id=137 HTTP/1.1" 200 -
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /formats?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ HTTP/1.1" 200 -
+[2026-09-19 10:31:43] Scheduler start f767a6a9 (active=1, queued=0)
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&preset=720p HTTP/1.1" 200 -
+[2026-09-19 10:31:43] Scheduler start a34827ce (active=1, queued=0)
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&preset=480p HTTP/1.1" 200 -
+[2026-09-19 10:31:43] Scheduler start 822cb4b9 (active=1, queued=0)
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&preset=audio HTTP/1.1" 200 -
+[2026-09-19 10:31:43] Scheduler start 258656ea (active=1, queued=0)
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&preset=best HTTP/1.1" 200 -
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&preset=720p HTTP/1.1" 400 -
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&preset=4k HTTP/1.1" 400 -
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&preset=--exec%3Dcalc HTTP/1.1" 400 -
+[2026-09-19 10:31:43] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ&preset=best%3B%20rm HTTP/1.1" 400 -
+[2026-09-19 10:31:43] storage migrated to schema v2
+[2026-09-19 10:31:43] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] storage migrated to schema v2
+[2026-09-19 10:31:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "GET /formats HTTP/1.1" 400 -
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "GET /formats?url=ftp%3A%2F%2Fx%2Fy HTTP/1.1" 400 -
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "GET /formats?url=https%3A%2F%2Fwww.tiktok.com%2F%40a%2Fvideo%2F1 HTTP/1.1" 400 -
+[2026-09-19 10:31:44] storage migrated to schema v2
+[2026-09-19 10:31:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] storage migrated to schema v2
+[2026-09-19 10:31:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "GET /formats?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ HTTP/1.1" 200 -
+[2026-09-19 10:31:44] storage migrated to schema v2
+[2026-09-19 10:31:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] storage migrated to schema v2
+[2026-09-19 10:31:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] formats probe failed rc=1: ERROR: unavailable
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "GET /formats?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ HTTP/1.1" 502 -
+[2026-09-19 10:31:44] storage migrated to schema v2
+[2026-09-19 10:31:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] storage migrated to schema v2
+[2026-09-19 10:31:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "GET /formats?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ%23t%3D30 HTTP/1.1" 200 -
+[2026-09-19 10:31:44] storage migrated to schema v2
+[2026-09-19 10:31:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] storage migrated to schema v2
+[2026-09-19 10:31:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] Scheduler start 4ff088b6 (active=1, queued=0)
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dd1 HTTP/1.1" 200 -
+[2026-09-19 10:31:44] deleted task 4ff088b6 (completed)
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 200 -
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "GET /status?id=4ff088b6 HTTP/1.1" 404 -
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
+[2026-09-19 10:31:44] storage migrated to schema v2
+[2026-09-19 10:31:44] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:44] Scheduler start a5ea8f7b (active=1, queued=0)
+[2026-09-19 10:31:44] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Drun HTTP/1.1" 200 -
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 409 -
+[2026-09-19 10:31:45] storage migrated to schema v2
+[2026-09-19 10:31:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 404 -
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 400 -
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "POST /delete HTTP/1.1" 400 -
+[2026-09-19 10:31:45] storage migrated to schema v2
+[2026-09-19 10:31:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 10:31:45] storage migrated to schema v2
+[2026-09-19 10:31:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
+[2026-09-19 10:31:45] storage migrated to schema v2
+[2026-09-19 10:31:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:45] Scheduler start 9f3b364e (active=1, queued=0)
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3De1 HTTP/1.1" 200 -
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /events?id=9f3b364e HTTP/1.1" 200 -
+[2026-09-19 10:31:45] storage migrated to schema v2
+[2026-09-19 10:31:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /events HTTP/1.1" 400 -
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /events?id=../etc/passwd HTTP/1.1" 400 -
+[2026-09-19 10:31:45] storage migrated to schema v2
+[2026-09-19 10:31:45] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:45] HTTP 127.0.0.1 "GET /events?id=no-such-task HTTP/1.1" 404 -
+[2026-09-19 10:31:46] storage migrated to schema v2
+[2026-09-19 10:31:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
+[2026-09-19 10:31:46] storage migrated to schema v2
+[2026-09-19 10:31:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:46] Scheduler start 2e6a6e86 (active=1, queued=0)
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dh1 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] Scheduler start 0703febd (active=1, queued=0)
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dh2 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /history HTTP/1.1" 200 -
+[2026-09-19 10:31:46] storage migrated to schema v2
+[2026-09-19 10:31:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:46] Scheduler start c411fb17 (active=1, queued=0)
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dh3 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] Scheduler start fbf4eae7 (active=1, queued=0)
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dh4 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /history?limit=1 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /history?status=completed HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /history?status=error HTTP/1.1" 200 -
+[2026-09-19 10:31:46] storage migrated to schema v2
+[2026-09-19 10:31:46] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /history?limit=0 HTTP/1.1" 400 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /history?limit=abc HTTP/1.1" 400 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /history?limit=500 HTTP/1.1" 400 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /history?status=downloading HTTP/1.1" 400 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /status HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /status?id=no-such-task-id-xyz HTTP/1.1" 404 -
+[2026-09-19 10:31:46] Scheduler start 7212255f (active=1, queued=0)
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dm0 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] Scheduler start 871290a8 (active=1, queued=0)
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dm1 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] Scheduler start 5c13ca67 (active=1, queued=0)
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dm2 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] Scheduler start 705540d0 (active=1, queued=0)
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dm3 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /status?id=7212255f HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /status?id=871290a8 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /status?id=5c13ca67 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /status?id=705540d0 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 10:31:46] Scheduler start b7a99423 (active=1, queued=0)
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dsolo HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /status?id=b7a99423 HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /tasks HTTP/1.1" 200 -
+[2026-09-19 10:31:46] HTTP 127.0.0.1 "GET /nope HTTP/1.1" 404 -
+[2026-09-19 10:31:47] storage migrated to schema v2
+[2026-09-19 10:31:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:47] Scheduler start 31bbe515 (active=1, queued=0)
+[2026-09-19 10:31:47] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DdQw4w9WgXcQ%23t%3D42 HTTP/1.1" 200 -
+[2026-09-19 10:31:47] storage migrated to schema v2
+[2026-09-19 10:31:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:47] storage migrated to schema v2
+[2026-09-19 10:31:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:47] HTTP 127.0.0.1 "GET /download HTTP/1.1" 400 -
+[2026-09-19 10:31:47] HTTP 127.0.0.1 "GET /download?url=ftp%3A%2F%2Fyoutube.com%2Fwatch%3Fv%3Dabc123456 HTTP/1.1" 400 -
+[2026-09-19 10:31:47] HTTP 127.0.0.1 "GET /download?url=--exec%3Dcalc HTTP/1.1" 400 -
+[2026-09-19 10:31:47] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fuser%3Apw%40youtube.com%2Fv HTTP/1.1" 400 -
+[2026-09-19 10:31:47] storage migrated to schema v2
+[2026-09-19 10:31:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:47] storage migrated to schema v2
+[2026-09-19 10:31:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:47] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.tiktok.com%2F%40a%2Fvideo%2F1 HTTP/1.1" 400 -
+[2026-09-19 10:31:47] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fx.com%2Fa%2Fstatus%2F1 HTTP/1.1" 400 -
+[2026-09-19 10:31:47] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fv.mp4 HTTP/1.1" 400 -
+[2026-09-19 10:31:47] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1 HTTP/1.1" 400 -
+[2026-09-19 10:31:47] storage migrated to schema v2
+[2026-09-19 10:31:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:47] storage migrated to schema v2
+[2026-09-19 10:31:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:47] Scheduler start 2b475ea2 (active=1, queued=0)
+[2026-09-19 10:31:47] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fyoutu.be%2FdQw4w9WgXcQ HTTP/1.1" 200 -
+[2026-09-19 10:31:47] storage migrated to schema v2
+[2026-09-19 10:31:47] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage degraded: migration to v2 failed: file is not a database
+[2026-09-19 10:31:48] storage unavailable (C:\Users\ADMINI~1\AppData\Local\Temp\mediadock-restart-renm1lzj\tasks.db): migration failed: file is not a database; running without persistence
+[2026-09-19 10:31:48] storage disabled: running from memory only
+[2026-09-19 10:31:48] Scheduler start e8750217 (active=1, queued=0)
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] Scheduler start 02170e81 (active=1, queued=0)
+[2026-09-19 10:31:48] task 2bd9b55c was downloading at shutdown -> error/interrupted
+[2026-09-19 10:31:48] storage ready: 3 task(s) loaded, 1 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] Scheduler start 18598bbd (active=1, queued=0)
+[2026-09-19 10:31:48] storage ready: 1 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] task a8337b43 was downloading at shutdown -> error/interrupted
+[2026-09-19 10:31:48] storage ready: 1 task(s) loaded, 1 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] Scheduler start 82389ae2 (active=1, queued=0)
+[2026-09-19 10:31:48] storage ready: 1 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage ready: 1 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] task c5b43413 was pending at shutdown -> error/interrupted
+[2026-09-19 10:31:48] storage ready: 1 task(s) loaded, 1 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] Scheduler start 232ec1c4 (active=1, queued=0)
+[2026-09-19 10:31:48] Scheduler start bfae5eae (active=2, queued=0)
+[2026-09-19 10:31:48] Scheduler start c7ea8718 (active=3, queued=0)
+[2026-09-19 10:31:48] storage ready: 3 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:48] storage migrated to schema v2
+[2026-09-19 10:31:48] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 413 -
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Fa%09b HTTP/1.1" 400 -
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fexample.com%2Faaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa HTTP/1.1" 400 -
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] HTTP 127.0.0.1 "GET /download?url=javascript%3Aalert%281%29 HTTP/1.1" 400 -
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:49] Scheduler start 52b535a3 (active=1, queued=0)
+[2026-09-19 10:31:49] HTTP 127.0.0.1 "GET /download?url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3Dsecurl1 HTTP/1.1" 200 -
+[2026-09-19 10:31:49] storage migrated to schema v2
+[2026-09-19 10:31:49] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] request rejected: Host evil.com is not a loopback address
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
+[2026-09-19 10:31:50] request rejected: Host evil.com is not a loopback address
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
+[2026-09-19 10:31:50] request rejected: Host 0.0.0.0 is not a loopback address
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
+[2026-09-19 10:31:50] request rejected: Host 192.168.1.10 is not a loopback address
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] request rejected: Host evil.com is not a loopback address
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 403 -
+[2026-09-19 10:31:50] request rejected: Host evil.com is not a loopback address
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "OPTIONS /pause HTTP/1.1" 403 -
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:50] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:50] storage migrated to schema v2
+[2026-09-19 10:31:50] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] INFO-AFTER-DEBUG
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] WARN-LEVEL-MARKER
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] LONG-MARKER-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] probe url https://example.com/v?token=***&v=abc under ~\Videos\clip.mp4
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] request rejected: Origin host evil.com is not a YouTube domain
+[2026-09-19 10:31:51] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
+[2026-09-19 10:31:51] request rejected: Origin null is not allowed
+[2026-09-19 10:31:51] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
+[2026-09-19 10:31:51] request rejected: Origin * is not allowed
+[2026-09-19 10:31:51] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
+[2026-09-19 10:31:51] request rejected: malformed Origin (chrome-extension://abcdef)
+[2026-09-19 10:31:51] HTTP 127.0.0.1 "GET /health HTTP/1.1" 403 -
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] HTTP 127.0.0.1 "POST /pause HTTP/1.1" 400 -
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
+[2026-09-19 10:31:51] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:51] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:51] HTTP 127.0.0.1 "GET /health HTTP/1.1" 200 -
+[2026-09-19 10:31:51] storage migrated to schema v2
+[2026-09-19 10:31:51] storage ready: 0 task(s) loaded, 0 marked interrupted, 0 purged
 C:\Users\Administrator\Envs\mediadock\Scripts\python.exe : ..........
 .....................................................................
 .....................................................................
 .....................................................................
-.................................................
+.....................................................................
+..
 所在位置 行:1 字符: 25
 + ... \MediaDock; C:\Users\Administrator\Envs\mediadock\Scripts\pytho
 n.exe  ...
@@ -400,7 +477,7 @@ n.exe  ...
  
 ---------------------------------------------------------------------
 -
-Ran 266 tests in 14.949s
+Ran 288 tests in 16.391s
 
 OK
 EXIT=0

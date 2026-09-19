@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         MediaDock - Local YouTube Downloader
 // @namespace    http://tampermonkey.net/
-// @version      5.0
-// @description  一键调用本地 yt-dlp 下载 YouTube 视频，并显示所有页共享的多任务进度列表 (MediaDock Stage-005)
+// @version      5.1
+// @description  一键调用本地 yt-dlp 下载 YouTube 视频，选择清晰度，并显示所有页共享的多任务进度列表 (MediaDock Stage-008)
 // @match        https://www.youtube.com/watch*
 // @match        https://www.youtube.com/shorts/*
 // @grant        GM_xmlhttpRequest
@@ -32,8 +32,24 @@
     };
     // 错误码到中文提示 (Stage-005)：不改变服务端原始 error_code 语义
     const ERROR_HINTS = {
-        interrupted: '服务重启中断'
+        interrupted: '服务重启中断',
+        unsupported_platform: '该网站暂未支持',
+        platform_not_ready: '平台尚未接入',
+        invalid_format: '清晰度参数无效',
+        format_not_available: '该清晰度不可用',
+        formats_unavailable: '无法读取清晰度列表'
     };
+    // 清晰度预设 (Stage-008)：与服务端 core_formats.PRESETS 一一对应，
+    // 前端只发送名字，服务端负责解析成 yt-dlp 参数
+    const PRESET_OPTIONS = [
+        { name: 'best', label: '最佳 (1080p MP4)' },
+        { name: '1080p', label: '1080p' },
+        { name: '720p', label: '720p' },
+        { name: '480p', label: '480p' },
+        { name: 'audio', label: '仅音频' }
+    ];
+    const PRESET_STORAGE_KEY = 'mediadock.preset';
+    const DEFAULT_PRESET = 'best';
     // URL 归一化 (借鉴多合一脚本 cleanUrl)
     function cleanYouTubeUrl(raw) {
         try {
@@ -115,6 +131,65 @@
     let headerEl = null;
     let summaryEl = null;
     let listEl = null;
+    let presetSelect = null;
+    // =========================
+    // 清晰度选择 (Stage-008)：只保存名字，非法值回退默认
+    // =========================
+    function isKnownPreset(name) {
+        for (let i = 0; i < PRESET_OPTIONS.length; i++) {
+            if (PRESET_OPTIONS[i].name === name) return true;
+        }
+        return false;
+    }
+    function readStoredPreset() {
+        try {
+            const raw = window.localStorage.getItem(PRESET_STORAGE_KEY);
+            return isKnownPreset(raw) ? raw : DEFAULT_PRESET;
+        } catch (e) {
+            return DEFAULT_PRESET;
+        }
+    }
+    let selectedPreset = readStoredPreset();
+    function storePreset(name) {
+        try {
+            window.localStorage.setItem(PRESET_STORAGE_KEY, name);
+        } catch (e) {
+            console.log('[MediaDock] 清晰度偏好无法保存:', e);
+        }
+    }
+    function buildPresetSelect() {
+        const select = document.createElement('select');
+        select.id = 'mediadock-preset';
+        Object.assign(select.style, {
+            background: 'rgba(255,255,255,0.1)',
+            color: '#ffffff',
+            border: '1px solid rgba(255,255,255,0.25)',
+            borderRadius: '5px',
+            fontSize: '11px',
+            padding: '2px 4px',
+            maxWidth: '130px'
+        });
+        for (let i = 0; i < PRESET_OPTIONS.length; i++) {
+            const option = document.createElement('option');
+            option.value = PRESET_OPTIONS[i].name;
+            option.textContent = PRESET_OPTIONS[i].label;
+            option.style.color = '#111111';
+            if (PRESET_OPTIONS[i].name === selectedPreset) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        }
+        select.addEventListener('change', function () {
+            const value = String(select.value || '');
+            selectedPreset = isKnownPreset(value) ? value : DEFAULT_PRESET;
+            storePreset(selectedPreset);
+            console.log('[MediaDock] 清晰度:', selectedPreset);
+        });
+        select.addEventListener('click', function (event) {
+            event.stopPropagation();
+        });
+        return select;
+    }
     function narrowScreen() {
         return window.innerWidth < 620;
     }
@@ -159,6 +234,8 @@
         summaryEl.style.textAlign = 'right';
         headerEl.appendChild(titleEl);
         headerEl.appendChild(summaryEl);
+        presetSelect = buildPresetSelect();
+        headerEl.appendChild(presetSelect);
         headerEl.addEventListener('click', function () {
             listCollapsed = !listCollapsed;
             if (listEl) listEl.style.display = listCollapsed ? 'none' : 'block';
@@ -414,9 +491,51 @@
         console.log('[MediaDock] 提交下载:', url);
         submitting = true;
         setButton('⏳ 正在提交...', '#1976d2');
+        // Stage-008：非默认清晰度必须先查询 /formats，
+        // 服务端只接受它刚刚报告过的格式，前端不做任何格式拼接
+        if (selectedPreset !== DEFAULT_PRESET) {
+            fetchFormats(url, function (ok, code) {
+                if (!ok) {
+                    submitting = false;
+                    setButton('❌ 提交失败\n' + (code || 'formats_unavailable'),
+                              '#d32f2f');
+                    idleButtonSoon();
+                    return;
+                }
+                submitDownload(url);
+            });
+            return;
+        }
+        submitDownload(url);
+    }
+    function fetchFormats(url, done) {
         GM_xmlhttpRequest({
             method: 'GET',
-            url: SERVER + '/download?url=' + encodeURIComponent(url),
+            url: SERVER + '/formats?url=' + encodeURIComponent(url),
+            timeout: 60000,
+            onload: function (response) {
+                if (response.status === 200) {
+                    done(true, '');
+                    return;
+                }
+                let code = '';
+                try {
+                    code = JSON.parse(response.responseText).error_code || '';
+                } catch (e) { code = ''; }
+                done(false, code);
+            },
+            onerror: function () { done(false, 'formats_unavailable'); },
+            ontimeout: function () { done(false, 'formats_unavailable'); }
+        });
+    }
+    function submitDownload(url) {
+        let target = SERVER + '/download?url=' + encodeURIComponent(url);
+        if (selectedPreset !== DEFAULT_PRESET) {
+            target += '&preset=' + encodeURIComponent(selectedPreset);
+        }
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: target,
             timeout: 10000,
             onload: function (response) {
                 submitting = false;

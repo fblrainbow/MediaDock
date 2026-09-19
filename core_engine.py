@@ -68,9 +68,16 @@ def default_download_dir() -> str:
 
 
 def build_command(ytdlp: str, download_dir: str, url: str,
-                  ffmpeg_path: str = "") -> List[str]:
-    """argv list for one download; no shell, URL is always a single argument."""
-    command = [ytdlp, "-f", FORMAT_EXPR, "--merge-output-format", "mp4",
+                  ffmpeg_path: str = "",
+                  format_expr: str = "") -> List[str]:
+    """argv list for one download; no shell, URL is always a single argument.
+
+    `format_expr` comes from `core_formats.selector_for()` (constants or a
+    validated format id), never from raw user text; empty keeps the frozen
+    Stage-001 policy.
+    """
+    expression = str(format_expr or "").strip() or FORMAT_EXPR
+    command = [ytdlp, "-f", expression, "--merge-output-format", "mp4",
                "--newline", "--no-playlist"]
     if ffmpeg_path:
         command += ["--ffmpeg-location", str(ffmpeg_path)]
@@ -112,9 +119,12 @@ class DownloadEngine:
         if control.pause_requested():
             return self._finish_paused(task_id)
         command = build_command(self.ytdlp, self.download_dir, url,
-                                self.ffmpeg)
+                                self.ffmpeg,
+                                getattr(control, "format_expr", ""))
         self._log(f"Task {task_id} start: {url}")
         self._log(f"yt-dlp: {self.ytdlp}")
+        if getattr(control, "format_expr", ""):
+            self._log(f"format: {control.format_expr}")
         if self.ffmpeg:
             self._log(f"ffmpeg: {self.ffmpeg}")
         try:

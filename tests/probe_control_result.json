@@ -1,5 +1,5 @@
 {
-  "base": "http://127.0.0.1:54327",
+  "base": "http://127.0.0.1:56218",
   "bind": "127.0.0.1",
   "engine_stub": "scripted process (spawn replaced)",
   "download_dir": "E:\\GitHub\\MediaDock\\downloads",
@@ -39,16 +39,16 @@
       }
     ]
   },
-  "paused_task": "2c4dcab7",
+  "paused_task": "d2b82f1b",
   "pause_kept_breakpoint": true,
   "resume_reused_breakpoint": true,
   "cancel_cleaned_files": true,
   "isolation": {
-    "paused": "0c696ca6",
-    "untouched": "666d8e7a"
+    "paused": "4b9a6e53",
+    "untouched": "5e665973"
   },
   "queued_cancel": {
-    "queued_task": "c3658106"
+    "queued_task": "4f1f9fa3"
   },
   "scheduler": {
     "active_count": 3,

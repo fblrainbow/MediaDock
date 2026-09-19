@@ -17,7 +17,7 @@
 - 计划名称：MediaDock Local Media Platform
 - 计划文件：`plan-whole.md`
 - 当前版本：`0.2`
-- 当前状态：Stage-007 已完成，Stage-008 未开始
+- 当前状态：Stage-008 已完成，Stage-009 未开始
 - 计划负责人：[待填写]
 - 最后更新时间：2026-09-19
 - 当前阻塞：需要在进入高影响阶段前确认相关决策门禁
@@ -366,7 +366,7 @@ stateDiagram-v2
 | Stage-005 | 持久化与任务历史 | 服务重启后保留任务记录 | SQLite、迁移、历史查询 | Stage-004 | 2026-09-19 |
 | Stage-006 | 配置、依赖与安全加固 | 提升可配置性和本地安全 | `config.json`、依赖检查、安全测试 | Stage-001，建议 Stage-005 后完善 | 2026-09-19 |
 | Stage-007 | 平台 Adapter | 在不污染核心的情况下扩展平台 | Adapter 接口、YouTube Adapter、扩展预留 | Stage-002、Stage-006 | 2026-09-19 |
-| Stage-008 | 格式选择与 Formats API | 支持动态格式选择 | `/formats`、格式模型、前端选择器 | Stage-007 | - |
+| Stage-008 | 格式选择与 Formats API | 支持动态格式选择 | `/formats`、格式模型、前端选择器 | Stage-007 | 2026-09-19 |
 | Stage-009 | 音频模式与 Media Processor | 支持 Video to Audio 和统一媒体处理 | 媒体处理任务、MP3/M4A/WAV | Stage-005、Stage-006 | - |
 | Stage-010 | 发布、回归与长期扩展 | 固化交付、监控和后续扩展边界 | 发布包、文档、回滚方案、长期路线 | 全部必要阶段 | - |
 
@@ -741,6 +741,7 @@ flowchart TB
 | C-004 | Stage-005 引入 SQLite（`tasks.db`、schema v2）、`GET /history`、`GET /events`、`POST /delete`，`/health`+`/tasks` 增加 `storage`；`interrupted` 用 `error_code` 表达而不新增状态；新增错误码 `invalid_limit`/`invalid_status`/`not_deletable` | 落实 Stage-005 任务与 D-012/D-017，并把重启语义固化为可测试契约 | Stage-005（下游 Stage-006/009/010） | 低（Task 字段与既有 API 形状不变） | 局部调整，已写入 Stage-005.md 与 `docs/stage005-migration.md` | 0.2 |
 | C-005 | Stage-006 引入配置层（`core_config.py`/`config.json`）、依赖诊断（`core_deps.py`）、安全纯函数（`core_security.py`）；`/health` 增加 `config`+`dependencies`；新增错误码 `forbidden_host`(403)/`forbidden_origin`(403)/`payload_too_large`(413)；新增配置键 `max_active_tasks`（默认 3）与 `purge_keep`（默认 200）；`--check-config` CLI | 落实 Stage-006 任务与 D-004 强化、D-014 的本地启动检查，并把依赖与安全边界固化为可测试契约 | Stage-006（下游 Stage-007/008/009/010） | 低（Task 字段、状态机与既有 API 形状不变；默认值与 Stage-004/005 一致） | 局部调整，已写入 Stage-006.md 与 `docs/stage006-migration.md` | 0.2 |
 | C-006 | Stage-007 引入平台层 `core_platform.py`（`PlatformInfo`/`PlatformAdapter`/`YouTubeAdapter`/`PlatformRegistry`/`DEFAULT_REGISTRY`/`detect_platform()`/`platform_names()`）；`server.py` 的 `/download` 改为「`validate_url`（由检测层代调用）→ `detect_platform` → `adapter.info` → `scheduler.submit(url, platform)`」且不再含平台字符串；新增错误码 `unsupported_platform`(400)/`platform_not_ready`(400)；D-013 决议为「首批只支持 YouTube」；既有 HTTP「正常下载」测试夹具 URL 从 `example.com` 迁移到 YouTube | 落实 Stage-007 任务 1-3：把平台判定收敛为单一真值，并把「不支持平台」从隐式失败升级为显式拒绝 | Stage-007（下游 Stage-008/009/010） | 低（Task 字段、状态机、状态集合、并发/文件策略与既有 API 形状不变；只新增 400 分支，并对未注册 host 的 URL 由 200 变为 400） | 局部调整，已写入 Stage-007.md 与 `docs/stage007-migration.md` | 0.2 |
+| C-007 | Stage-008 引入格式层 `core_formats.py`（`PRESETS`、`resolve_preset`、`validate_format_id`、`selector_for`、`build_probe_command`、`parse_probe_output`、`build_formats_payload`、`FormatsProbe`）；新增 `GET /formats?url=`；`/download` 接受 `preset`/`format_id`（必须先查 `/formats`）；新增错误码 `invalid_format`(400)/`format_not_available`(400)/`formats_unavailable`(502)；`TaskControl.format_expr` + `Scheduler` 发送期格式记录（**不新增 Task 字段、无 schema 变更**）；`MediaDock.js` 5.1 增加清晰度下拉 | 落实 Stage-008 任务 1-5：把格式选择固化为「固定预设表 + 探测结果校验 + 服务端拼装 argv」，并保持默认策略不变 | Stage-008（下游 Stage-009/010） | 低（Task 字段、状态机、状态集合、并发/文件策略、平台检测与既有 API 形状不变；不带格式参数的请求路径完全不变） | 局部调整，已写入 Stage-008.md 与 `docs/stage008-migration.md` | 0.2 |
 
 高影响变更必须在继续开发前更新 `plan-whole.md` 和受影响的 Stage 文件。低影响变更可以在 Stage 文件中记录，但不能改变总体契约而不升级版本。
 

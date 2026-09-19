@@ -81,9 +81,10 @@ def main():
         raise SystemExit(f"FAIL: unclosed {stack}")
 
     required = [
-        "@version      5.0",
+        "@version      5.1",
         "'/tasks'",
         "'/download?url='",
+        "'/formats?url='",
         "'/pause'",
         "'/resume'",
         "'/cancel'",
@@ -93,6 +94,10 @@ def main():
         "data-control",
         "MAX_VISIBLE_ROWS = 20",
         "mediadock-completed-toggle",
+        "mediadock-preset",
+        "PRESET_OPTIONS",
+        "DEFAULT_PRESET",
+        "仅音频",
         "yt-navigate-finish",
         "正在提交",
         "已加入任务列表",
@@ -117,6 +122,12 @@ def main():
     present = [needle for needle in forbidden if needle in no_comments]
     if present:
         raise SystemExit(f"FAIL: forbidden leftovers in code {present}")
+
+    # Stage-008：前端只发送 preset 名字，绝不拼接 yt-dlp 选择器
+    selectors = ["bv*", "bestaudio", "+ba/", "height<="]
+    leaked = [needle for needle in selectors if needle in no_comments]
+    if leaked:
+        raise SystemExit(f"FAIL: yt-dlp selector built in JS {leaked}")
 
     # Stage-004：控制请求必须走 POST + JSON，而不是 GET 查询串
     if "method: 'POST'" not in no_comments:
