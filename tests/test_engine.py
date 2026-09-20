@@ -85,6 +85,12 @@ class TestParser(unittest.TestCase):
         e = parse_line('[Merger] Merging formats into "downloads\\o.mp4"')
         self.assertEqual((e.kind, e.path), ("merged", "downloads\\o.mp4"))
 
+    def test_extract_audio_records_the_mp3(self):
+        """Stage-012: `-x` reports the final file, and it must be recorded."""
+        e = parse_line("[ExtractAudio] Destination: downloads\\song [abc].mp3")
+        self.assertEqual(e.kind, "merged")
+        self.assertTrue(e.path.endswith("song [abc].mp3"), e.path)
+
     def test_title(self):
         e = parse_line("[info] Some Video: Downloading video")
         self.assertEqual((e.kind, e.title), ("title", "Some Video"))
@@ -104,6 +110,23 @@ class TestCommand(unittest.TestCase):
         for flag in ("--merge-output-format", "mp4", "--newline",
                      "--no-playlist"):
             self.assertIn(flag, cmd)
+
+    def test_audio_format_replaces_merge(self):
+        """Stage-012: `audio_format` extracts audio instead of merging MP4."""
+        cmd = build_command("YT", "DIR", "URL", "FF", "bestaudio/best",
+                            "mp3")
+        self.assertEqual(cmd[cmd.index("-f") + 1], "bestaudio/best")
+        self.assertEqual(cmd[cmd.index("--audio-format") + 1], "mp3")
+        self.assertIn("--extract-audio", cmd)
+        self.assertNotIn("--merge-output-format", cmd)
+        self.assertEqual(cmd[-3:], ["-P", "DIR", "URL"])
+        self.assertEqual(cmd[cmd.index("--ffmpeg-location") + 1], "FF")
+
+    def test_empty_audio_format_keeps_the_frozen_policy(self):
+        for value in ("", "   ", None):
+            cmd = build_command("YT", "DIR", "URL", "", FORMAT_EXPR, value)
+            self.assertIn("--merge-output-format", cmd, repr(value))
+            self.assertNotIn("--extract-audio", cmd, repr(value))
 
 
 class TestEngine(unittest.TestCase):

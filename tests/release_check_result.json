@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-09-20 12:57:41",
+  "generated_at": "2026-09-20 13:22:19",
   "release": {
-    "app": "1.0.1",
+    "app": "1.0.2",
     "api": "1",
     "userscript": "5.2",
     "schema": 2
@@ -75,16 +75,16 @@
   },
   "details": {
     "static.required_files": "all present",
-    "static.app_version_shape": "APP_VERSION=1.0.1",
+    "static.app_version_shape": "APP_VERSION=1.0.2",
     "static.userscript_version": "file=5.2 expected=5.2",
-    "static.changelog_version": "changelog=1.0.1 APP_VERSION=1.0.1",
-    "static.readme_version": "README.md states 1.0.1",
+    "static.changelog_version": "changelog=1.0.2 APP_VERSION=1.0.2",
+    "static.readme_version": "README.md states 1.0.2",
     "static.config_example_keys": "keys match",
     "cli.check_config_rc0": "rc=0",
     "cli.check_config_payload": "keys=config,dependencies",
-    "cli.userscript_structure": "JS STRUCTURE OK (637 lines, 19083 code chars, no backticks, anchors present)",
+    "cli.userscript_structure": "JS STRUCTURE OK (638 lines, 19096 code chars, no backticks, anchors present)",
     "health.200": "code=200",
-    "health.version_app": "app=1.0.1 expected=1.0.1",
+    "health.version_app": "app=1.0.2 expected=1.0.2",
     "health.version_api": "api=1",
     "health.version_userscript": "userscript=5.2",
     "health.version_schema": "schema=2 expected=2",
@@ -125,16 +125,16 @@
     "delete.then_404": "code=404",
     "delete.repeat_404": "code=404",
     "restart.completed_before": "status=completed",
-    "restart.backup_created": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-release-ljobmr95\\tasks.db.backup",
+    "restart.backup_created": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-release-zngxya1g\\tasks.db.backup",
     "restart.completed_survives": "status=completed",
     "restart.downloading_interrupted": "status=error error_code=interrupted",
     "restart.paused_stays_paused": "status=paused",
-    "restart.storage_ok": "{\"kind\": \"sqlite\", \"db\": \"C:\\\\Users\\\\ADMINI~1\\\\AppData\\\\Local\\\\Temp\\\\mediadock-release-ljobmr95\\\\tasks.db\", \"schema_version\": 2, \"degraded\": false, \"reason\": \"\"}",
+    "restart.storage_ok": "{\"kind\": \"sqlite\", \"db\": \"C:\\\\Users\\\\ADMINI~1\\\\AppData\\\\Local\\\\Temp\\\\mediadock-release-zngxya1g\\\\tasks.db\", \"schema_version\": 2, \"degraded\": false, \"reason\": \"\"}",
     "rollback.db_restore_history": "code=200 total=3",
-    "rollback.degraded_memory": "{\"kind\": \"memory\", \"db\": \"C:\\\\Users\\\\ADMINI~1\\\\AppData\\\\Local\\\\Temp\\\\mediadock-release-ljobmr95\\\\corrupt.db\", \"schema_version\": 0, \"degraded\": true, \"reason\": \"migration failed: file is not a database\"}",
-    "rollback.degraded_version": "code=200 version={\"app\": \"1.0.1\", \"api\": \"1\", \"userscript\": \"5.2\", \"schema\": 0}",
+    "rollback.degraded_memory": "{\"kind\": \"memory\", \"db\": \"C:\\\\Users\\\\ADMINI~1\\\\AppData\\\\Local\\\\Temp\\\\mediadock-release-zngxya1g\\\\corrupt.db\", \"schema_version\": 0, \"degraded\": true, \"reason\": \"migration failed: file is not a database\"}",
+    "rollback.degraded_version": "code=200 version={\"app\": \"1.0.2\", \"api\": \"1\", \"userscript\": \"5.2\", \"schema\": 0}",
     "rollback.degraded_accepts_task": "code=200"
   },
-  "duration_seconds": 1.25,
-  "temp_dir": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-release-ljobmr95"
+  "duration_seconds": 1.39,
+  "temp_dir": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-release-zngxya1g"
 }

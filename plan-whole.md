@@ -16,8 +16,8 @@
 
 - 计划名称：MediaDock Local Media Platform
 - 计划文件：`plan-whole.md`
-- 当前版本：`0.4`
-- 当前状态：全部阶段已完成（Stage-001 ~ Stage-011），v1.0.1 已交付
+- 当前版本：`0.5`
+- 当前状态：全部阶段已完成（Stage-001 ~ Stage-012），v1.0.2 已交付
 - 计划负责人：[待填写]
 - 最后更新时间：2026-09-20
 - 当前阻塞：无（长期扩展候选见 `docs/release-notes.md`，需新阶段评估）
@@ -370,6 +370,7 @@ stateDiagram-v2
 | Stage-009 | 音频模式与 Media Processor | 支持 Video to Audio 和统一媒体处理 | 媒体处理任务、MP3/M4A/WAV | Stage-005、Stage-006 | 2026-09-19 |
 | Stage-010 | 发布、回归与长期扩展 | 固化交付、监控和后续扩展边界 | 发布包、文档、回滚方案、长期路线 | 全部必要阶段 | 2026-09-20 |
 | Stage-011 | 单实例启动接管 | 启动时自动结束旧的 MediaDock 实例，无需手动排查端口占用 | `core_instance.py`、`--restart`、接管探针 | Stage-003、Stage-006、Stage-010 | 2026-09-20 |
+| Stage-012 | 仅音频预设产出 MP3 | 「仅音频」不再只选流，而是提取为真实 MP3 | 预设容器声明、`-x --audio-format mp3`、真实 argv 证据 | Stage-008、Stage-009、Stage-010 | 2026-09-20 |
 
 > 完成时间 `-` 表示尚未完成；阶段完成后填写实际完成日期。
 
@@ -720,6 +721,7 @@ flowchart TB
 | D-016 | 默认最多显示 20 个；未完成超量不隐藏并允许面板滚动，完成任务超量默认折叠 | 已确认 | Stage-003 |
 | D-017 | 完成/失败任务暂时保留，可手动删除；URL/video ID 去重后续扩展 | 已确认 | Stage-003、Stage-005 |
 | D-018 | 单实例启动策略：同一端口只允许一个实例（继续关闭地址复用）；启动时若端口被本机 MediaDock 实例占用，则**接管**（结束该进程树 → 等待端口释放 → 重新绑定），占用者不是 MediaDock 时拒绝接管并保留退出码 2；另提供 `--restart` 主动接管 | 已确认（Stage-011 实现，`core_instance.take_over_port`） | Stage-003、Stage-011 |
+| D-019 | 「仅音频」语义：该预设必须产出真实可播放的 **MP3**（`-x --audio-format mp3 --audio-quality 0`），而不是平台原始音频容器（`.webm`/Opus）；容器名是 `core_formats` 常量，与视频预设的 `--merge-output-format mp4` 互斥；其他容器（m4a/wav）仍走 `POST /audio` | 已确认（Stage-012 实现，`Preset.audio_format` + `audio_format_for()`） | Stage-008、Stage-009、Stage-012 |
 
 ---
 
@@ -747,6 +749,7 @@ flowchart TB
 | C-008 | Stage-009 引入媒体处理层 `core_media.py`（`TARGETS`、`resolve_target`、`build_ffmpeg_command`、`output_path_for`、`find_source_file`、`parse_media_line`、`has_free_space`、`AudioProcessor`）；新增 `GET /audio`（目标表）与 `POST /audio?target=mp3|m4a|wav`（由已完成的下载任务创建 `type="audio"` 任务）；新增错误码 `invalid_audio_target`(400)/`not_a_download_task`(409)/`source_not_found`(404)/`source_outside_download_dir`(400) 与任务级 `ffmpeg_missing`/`ffmpeg_failed`/`output_missing`/`insufficient_space`；`TaskManager.create(task_type=)`、`Scheduler.submit/admit(media_job=)`、`TaskControl.media_job`、`server.task_engine()` 分流 | 落实 Stage-009 任务 1-5：把音频转换纳入与下载完全相同的 Task 状态机、控制接口、并发上限、存储与历史；目标名是唯一可从 HTTP 传入的转换参数 | Stage-009（下游 Stage-010） | 低（Task 字段、状态集合、存储 schema、API 错误格式、并发/文件策略与既有路由形状不变；无 `media_job` 的路径完全不变） | 局部调整，已写入 Stage-009.md 与 `docs/stage009-migration.md` | 0.2 |
 | C-009 | Stage-010 引入发布层 `core_release.py`（`APP_VERSION="1.0.0"`/`API_VERSION="1"`/`USERSCRIPT_VERSION="5.2"`、文档清单、变更日志解析、`config.example.json` 键对齐、`release_info()`）；`/health` 新增 `version {app, api, userscript, schema}`；新增发布门禁 `tests/release_check.py`（静态 + 真实 HTTP 全链路 + 重启 + 回滚演练 + 安全守卫，60 项）与 `tests/test_release.py`（27 用例）；`MediaDock.js` 5.2（显示服务端版本 + 版本不一致提示）；新增 `README.md` 与 7 份交付文档；D-014 决议为「手动启动 + 可选开机自启脚本」 | 落实 Stage-010 任务 1-5：形成可重复安装、验证、发布和回滚的交付流程，并把版本号收敛为单点真值 | Stage-010（收口全部阶段） | 低（`/health` 仅新增增量字段；Task 字段、状态机、存储 schema、排序与显示契约、既有 API 与错误码全部不变；无新增第三方依赖） | 局部调整，计划版本升级为 `0.3`，已写入 Stage-010.md 与 `docs/stage010-migration.md` | 0.3 |
 | C-010 | Stage-011 新增 `core_instance.py`（`PortOwner`/`find_port_owner`/`kill_process_tree`/`port_is_free`/`wait_port_free`/`take_over_port`，五态结论 free/killed/foreign/unknown/failed）；`server.py` 抽出 `bind_server()`/`free_port_for_start()`，新增 `--restart` 与未知选项校验，绑定失败时自动接管并重试一次；版本 `1.0.0 → 1.0.1`；D-018 决议为「单实例 + 启动接管」 | 落实用户诉求「每次启动先杀掉之前存在的实例」，同时避免误杀非 MediaDock 进程 | Stage-011（下游无） | 低（HTTP 契约、Task 字段、状态机、存储 schema、排序与文件策略全部不变；仅新增命令行选项与启动期进程管理） | 局部调整，计划版本升级为 `0.4`，已写入 Stage-011.md 与 `docs/stage011-migration.md` | 0.4 |
+| C-011 | Stage-012 `core_formats.Preset` 新增 `audio_format`（`AUDIO_PRESET_FORMAT="mp3"`）与 `audio_format_for()`；`core_engine.build_command(..., audio_format=)` 用 `-x --audio-format mp3 --audio-quality 0` 取代 `--merge-output-format mp4`（互斥）；`core_parse` 识别 `[ExtractAudio] Destination:` 作为最终产物；`TaskControl.audio_format` + `Scheduler` 发送期记录；`resolve_format_choice()` 返回 4 元组；`/formats` 的 `presets[]` 新增 `audio_format`；`MediaDock.js` 标签 `仅音频 (MP3)` 与「处理中」文案；版本 `1.0.1 → 1.0.2` | 落实用户反馈：选「仅音频」得到的 `.webm`（Opus）不是 MP3；把「选流」升级为「选流 + 固定容器提取」 | Stage-012（下游无） | 低（Task 字段、状态集合、存储 schema、控制 API、错误码、排序与文件策略不变；默认与视频预设 argv 逐字不变；仅 `/formats` 载荷新增字段） | 局部调整，计划版本升级为 `0.5`，已写入 Stage-012.md 与 `docs/stage012-migration.md` | 0.5 |
 
 高影响变更必须在继续开发前更新 `plan-whole.md` 和受影响的 Stage 文件。低影响变更可以在 Stage 文件中记录，但不能改变总体契约而不升级版本。
 ---
@@ -816,9 +819,9 @@ Stage-006 至 Stage-010 在前五个阶段的接口和状态稳定后再拆分�
 | MVP 主流程可重复执行 | `tests/probe_chain.py`、`tests/probe_persist.py` 走真实 HTTP+调度链路；`tests/release_check.py` 运行期 60 项全通过 |
 | Task 模型/状态/API 单一来源 | `core_task.py` + `core_manager.py` 状态机 + `plan-whole.md` §6；`tests/test_task.py`、`tests/test_manager.py`、`tests/test_apiv2.py` |
 | 阶段验收与影响检查记录 | `Stage-001.md` ~ `Stage-010.md` 各含「阶段验收标准 / 阶段衔接检查 / 阶段完成影响检查 / 阶段完成签字」 |
-| 前置阶段回归测试 | 每阶段完成时执行全量单测 + 全部探针；最终 `ran=355 fail=0 err=0`，9/9 探针 rc=0 |
+| 前置阶段回归测试 | 每阶段完成时执行全量单测 + 全部探针；最终 `ran=361 fail=0 err=0`，9/9 探针 rc=0 |
 | 后续阶段计划同步更新 | 各 Stage 文件「实际输出与计划差异」+ 本文件 §13 变更记录 C-002 ~ C-009 |
-| 正常/边界/异常/兼容/安全测试记录 | `ran=355 fail=0 err=0`；9 个探针（含真实 FFmpeg、真实进程终止、越界路径、真实端口接管）；`tests/release_check_result.json` |
+| 正常/边界/异常/兼容/安全测试记录 | `ran=361 fail=0 err=0`；9 个探针（含真实 FFmpeg、真实进程终止、越界路径、真实端口接管、真实下载 argv）；`tests/release_check_result.json` |
 | 任务排序契约 | `core_listing.py` + `tests/test_listing.py`；发布检查 `tasks.order_*` |
 | 默认 20 条 + 未完成超量滚动 | `MediaDock.js` `MAX_VISIBLE_ROWS = 20` + 面板内部滚动；`tests/check_userscript.py` 锚点校验 |
 | 完成折叠/展开 | `MediaDock.js` `makeCompletedToggle`（`mediadock-completed-toggle` 锚点） |
@@ -845,7 +848,7 @@ Stage-006 至 Stage-010 在前五个阶段的接口和状态稳定后再拆分�
 
 ### 17.1 当前状态与下一步
 
-- 当前状态：Stage-001 ~ Stage-011 全部完成，v1.0.1 已交付（见 §16.1 验收证据）。
+- 当前状态：Stage-001 ~ Stage-012 全部完成，v1.0.2 已交付（见 §16.1 验收证据）。
 - 下一步不在本计划范围内。若要继续演进，必须先做需求评估并新增阶段文件，
   候选方向见 `docs/release-notes.md` 的「下一步候选」（第二批平台、字幕/缩略图、
   清晰度写入历史、安装包等），不得直接在本计划末尾追加实现任务。

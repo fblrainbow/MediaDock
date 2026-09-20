@@ -13,7 +13,7 @@ from core_control import ControlError
 from core_deps import failed_checks, run_checks
 from core_engine import DownloadEngine, resolve_ffmpeg
 from core_formats import (DEFAULT_PRESET, ERROR_FORMAT_NOT_AVAILABLE,
-                          ERROR_INVALID_FORMAT, FormatsProbe,
+                          ERROR_INVALID_FORMAT, FormatsProbe, audio_format_for,
                           format_id_present, preset_satisfied, resolve_preset,
                           selector_for, validate_format_id)
 from core_instance import take_over_port
@@ -270,36 +270,38 @@ def cached_formats(url):
 
 
 def resolve_format_choice(url, preset_raw, format_id_raw):
-    """`(expression, error_code, message)`; never returns unvalidated input.
+    """`(expression, audio_format, error_code, message)`; nothing unvalidated.
 
     A non-default preset or an explicit `format_id` must match something a
     previous `/formats` call really reported for this URL, so no arbitrary text
-    can reach the yt-dlp argv (Stage-008.md 5.4).
+    can reach the yt-dlp argv (Stage-008.md 5.4). `audio_format` is non-empty
+    only for the fixed `audio` preset, which extracts MP3 with FFmpeg
+    (Stage-012).
     """
     preset, code, message = resolve_preset(preset_raw)
     if preset is None:
-        return "", code, message
+        return "", "", code, message
     format_id = str(format_id_raw or "").strip()
     cached = cached_formats(url)
     formats = list(cached.get("formats") or []) if cached else []
     if format_id:
         ok, message = validate_format_id(format_id)
         if not ok:
-            return "", ERROR_INVALID_FORMAT, message
+            return "", "", ERROR_INVALID_FORMAT, message
         if not format_id_present(format_id, formats):
-            return "", ERROR_FORMAT_NOT_AVAILABLE, (
+            return "", "", ERROR_FORMAT_NOT_AVAILABLE, (
                 "format_id is not available for this video; "
                 "call /formats first")
-        return selector_for(None, format_id), "", ""
+        return selector_for(None, format_id), "", "", ""
     if preset.name == DEFAULT_PRESET:
-        return selector_for(preset), "", ""
+        return selector_for(preset), "", "", ""
     if not cached:
-        return "", ERROR_FORMAT_NOT_AVAILABLE, (
+        return "", "", ERROR_FORMAT_NOT_AVAILABLE, (
             "call /formats before choosing a preset")
     if not preset_satisfied(preset, formats):
-        return "", ERROR_FORMAT_NOT_AVAILABLE, (
+        return "", "", ERROR_FORMAT_NOT_AVAILABLE, (
             f"preset {preset.name} is not available for this video")
-    return selector_for(preset), "", ""
+    return (selector_for(preset), audio_format_for(preset), "", "")
 
 
 def media_processor_factory():
@@ -731,7 +733,7 @@ class Handler(BaseHTTPRequestHandler):
                 return
             info = adapter.info(url)
             # 格式选择 (Stage-008)：preset / format_id 必须来自固定表或 /formats 结果
-            expression, code_name, message = resolve_format_choice(
+            expression, audio_format, code_name, message = resolve_format_choice(
                 info.url, params.get("preset", [None])[0],
                 params.get("format_id", [None])[0])
             if code_name:
@@ -740,7 +742,8 @@ class Handler(BaseHTTPRequestHandler):
                 return
             # 归一化 URL 后创建 pending Task：有空闲槽位就启动，否则 FIFO 排队
             created = scheduler.submit(info.url, platform=info.name,
-                                       format_expr=expression)
+                                       format_expr=expression,
+                                       audio_format=audio_format)
             self._json({"task_id": created["task_id"]})
             return
         # 音频目标列表 (Stage-009)：只列出固定表，不执行任何转换

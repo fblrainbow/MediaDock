@@ -24,6 +24,8 @@
 | 非默认清晰度必须先探测 | `/download?preset=` 要求本进程先成功调用过 `/formats`，否则 400 `format_not_available` | Stage-008 差异 2 |
 | 探测结果会过期 | `/formats` 结果按 URL 缓存在内存（上限 20 条），服务重启即清空 | Stage-008 |
 | 不做「更高清晰度」承诺 | 4K/8K 未纳入验收；预设表固定为 Best/1080p/720p/480p/仅音频 | 计划 §4.2 |
+| 「仅音频」固定为 MP3 | 该预设只产出 `.mp3`（`-x --audio-format mp3 --audio-quality 0`），前端不能选编码参数或改为 m4a/wav；要其他容器请用 `POST /audio` | Stage-012 |
+| 仅音频依赖 FFmpeg | 提取音频由 yt-dlp 调用 FFmpeg 完成，FFmpeg 缺失时任务失败（依赖诊断会提前报 `ffmpeg_missing`） | Stage-012 |
 
 ---
 
@@ -36,7 +38,7 @@
 | 无裁剪/归一化/变速 | 只做「整段转码」 |
 | 无字幕/缩略图 | 不下载也不内嵌 |
 | 输出与源文件同目录 | 输出路径 = 源文件同主名 + 目标扩展名，因此仍在 `download_dir` 内 |
-| 前端不触发音频转换 | `/audio` 目前是已测的 API 契约，Userscript 不提供音频按钮 |
+| 前端不触发音频转换 | `POST /audio` 仍是 API 契约（把已完成的视频转成 mp3/m4a/wav）；前端只用「仅音频 (MP3)」预设直接下载 MP3 |
 
 ---
 

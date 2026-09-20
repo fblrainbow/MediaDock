@@ -19,6 +19,8 @@ TITLE_RE = re.compile(r"\[info\]\s+(.+?):\s+Downloading")
 DEST_RE = re.compile(r"\[download\]\s+Destination:\s*(.+?)\s*$")
 ALREADY_RE = re.compile(r"\[download\]\s+(.+?)\s+has already been downloaded")
 MERGE_PATH_RE = re.compile(r"\[Merger\]\s+Merging formats into\s+\"(.+?)\"")
+# Stage-012: yt-dlp's audio extraction (`-x`) reports the final file this way.
+EXTRACT_PATH_RE = re.compile(r"\[ExtractAudio\]\s+Destination:\s*(.+?)\s*$")
 
 
 @dataclass(frozen=True)
@@ -38,6 +40,10 @@ def parse_line(line: str) -> ProgressEvent:
     merged = MERGE_PATH_RE.search(text)
     if merged:
         return ProgressEvent(kind="merged", path=merged.group(1).strip())
+    # 提取音频与合并同义：都是「本次运行的最终产物路径」
+    extracted = EXTRACT_PATH_RE.search(text)
+    if extracted:
+        return ProgressEvent(kind="merged", path=extracted.group(1).strip())
     if MERGE_RE.search(text):
         return ProgressEvent(kind="merging")
     already = ALREADY_RE.search(text)

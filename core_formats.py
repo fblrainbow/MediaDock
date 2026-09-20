@@ -42,6 +42,10 @@ ERROR_INVALID_FORMAT = "invalid_format"
 ERROR_FORMAT_NOT_AVAILABLE = "format_not_available"
 ERROR_FORMATS_UNAVAILABLE = "formats_unavailable"
 
+# Stage-012: container the `audio` preset is extracted into by FFmpeg.
+# A constant, never user text (same rule as the `-f` selectors).
+AUDIO_PRESET_FORMAT = "mp3"
+
 
 @dataclass(frozen=True)
 class Preset:
@@ -50,10 +54,12 @@ class Preset:
     kind: str            # "video" | "audio"
     selector: str        # yt-dlp -f expression (constant, never user text)
     max_height: int = 0  # 0 = no height ceiling
+    audio_format: str = ""  # non-empty = extract audio into this container
 
     def to_dict(self) -> Dict[str, Any]:
         return {"name": self.name, "label": self.label, "kind": self.kind,
-                "selector": self.selector, "max_height": self.max_height}
+                "selector": self.selector, "max_height": self.max_height,
+                "audio_format": self.audio_format}
 
 
 # Order = UI order. `best` keeps the frozen Stage-001 expression.
@@ -63,9 +69,13 @@ PRESETS: Tuple[Preset, ...] = (
            "bv*[height<=1080]+ba/b[height<=1080]", 1080),
     Preset("720p", "720p", "video", "bv*[height<=720]+ba/b[height<=720]", 720),
     Preset("480p", "480p", "video", "bv*[height<=480]+ba/b[height<=480]", 480),
-    # Stage-008 only selects the best audio-only stream; extracting MP3/M4A is
-    # Stage-009 (Media Processor).
-    Preset("audio", "Audio only", "audio", "bestaudio/best", 0),
+    # Stage-008 selected the best audio-only stream; Stage-012 additionally
+    # extracts MP3 with FFmpeg (`-x`), so the file is a real .mp3 instead of the
+    # platform's native audio container (.webm/opus on YouTube).
+    # Stage-009's `/audio` endpoint remains the way to convert an already
+    # completed video into mp3/m4a/wav after the fact.
+    Preset("audio", "Audio only (MP3)", "audio", "bestaudio/best", 0,
+           AUDIO_PRESET_FORMAT),
 )
 
 PRESET_BY_NAME: Dict[str, Preset] = {p.name: p for p in PRESETS}
@@ -97,6 +107,18 @@ def validate_format_id(value: Any) -> Tuple[bool, str]:
         return False, ("format_id must be 1-64 chars of "
                        "[A-Za-z0-9_.-] starting with a letter or digit")
     return True, ""
+
+
+def audio_format_for(preset: Optional[Preset] = None,
+                     format_id: str = "") -> str:
+    """Container to extract into, or `""` for a plain download (Stage-012).
+
+    Only the fixed `audio` preset requests extraction. An explicit
+    `format_id` keeps whatever the caller picked: no implicit transcoding.
+    """
+    if format_id or preset is None:
+        return ""
+    return str(preset.audio_format or "")
 
 
 def selector_for(preset: Optional[Preset] = None,

@@ -93,15 +93,17 @@ class TaskControl:
 
     Stage-008 adds `format_expr`: the resolved yt-dlp `-f` expression for this
     run. Stage-009 adds `media_job`: the audio-conversion record
-    (`{"kind": "audio", "source": ..., "target": ...}`). The Scheduler sets
-    both from its own send-time records, so no engine has to trust a raw HTTP
-    value and stub engines may ignore them.
+    (`{"kind": "audio", "source": ..., "target": ...}`). Stage-012 adds
+    `audio_format`: the container the `audio` preset must be extracted into.
+    The Scheduler sets all of them from its own send-time records, so no engine
+    has to trust a raw HTTP value and stub engines may ignore them.
     """
 
     def __init__(self, task_id: str,
                  logger: Optional[Callable[..., None]] = None):
         self.task_id = task_id
         self.format_expr = ""
+        self.audio_format = ""
         self.media_job: Dict[str, Any] = {}
         self._lock = threading.RLock()
         self._pause = False

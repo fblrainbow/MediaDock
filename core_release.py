@@ -25,7 +25,7 @@ from typing import Any, Dict, List, Optional, Sequence
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-APP_VERSION = "1.0.1"
+APP_VERSION = "1.0.2"
 API_VERSION = "1"
 USERSCRIPT_VERSION = "5.2"
 RELEASE_DATE = "2026-09-20"

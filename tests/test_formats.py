@@ -85,8 +85,13 @@ class TestPresets(unittest.TestCase):
         self.assertEqual(DEFAULT_PRESET, "best")
         for item in presets_public():
             self.assertEqual(sorted(item),
-                             ["kind", "label", "max_height", "name",
-                              "selector"])
+                             ["audio_format", "kind", "label", "max_height",
+                              "name", "selector"])
+        by_name = {item["name"]: item for item in presets_public()}
+        # 只有 audio 预设请求转码成 MP3（Stage-012），其余一律不转码
+        self.assertEqual(by_name["audio"]["audio_format"], "mp3")
+        for name in ("best", "1080p", "720p", "480p"):
+            self.assertEqual(by_name[name]["audio_format"], "", name)
 
     def test_default_preset_keeps_the_frozen_policy(self):
         preset, code, message = resolve_preset(None)
@@ -336,6 +341,34 @@ class TestFormatSelection(FormatsApiBase):
             self.assertEqual(code, 200, (preset, data))
             self.assertEqual(srv.scheduler.format_for(data["task_id"]),
                              selector, preset)
+
+    def test_audio_preset_extracts_mp3(self):
+        """Stage-012: 仅音频 must produce a real .mp3, not the native stream."""
+        self.assertEqual(self.json_get(self.formats_url())[0], 200)
+        code, data = self.json_get(self.url("&preset=audio"))
+        self.assertEqual(code, 200, data)
+        task_id = data["task_id"]
+        self.assertEqual(srv.scheduler.audio_format_for(task_id), "mp3")
+        command = build_command("yt-dlp.exe", "downloads", URL, "",
+                                srv.scheduler.format_for(task_id),
+                                srv.scheduler.audio_format_for(task_id))
+        self.assertIn("--extract-audio", command)
+        self.assertEqual(command[command.index("--audio-format") + 1], "mp3")
+        self.assertNotIn("--merge-output-format", command)
+
+    def test_video_presets_never_extract_audio(self):
+        self.assertEqual(self.json_get(self.formats_url())[0], 200)
+        for preset in ("best", "720p"):
+            code, data = self.json_get(self.url("&preset=" + preset))
+            self.assertEqual(code, 200, (preset, data))
+            self.assertEqual(srv.scheduler.audio_format_for(data["task_id"]),
+                             "", preset)
+
+    def test_format_id_does_not_force_transcoding(self):
+        self.assertEqual(self.json_get(self.formats_url())[0], 200)
+        code, data = self.json_get(self.url("&preset=audio&format_id=137"))
+        self.assertEqual(code, 200, data)
+        self.assertEqual(srv.scheduler.audio_format_for(data["task_id"]), "")
 
     def test_format_id_must_come_from_formats(self):
         code, data = self.json_get(self.url("&format_id=137"))

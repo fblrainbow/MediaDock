@@ -46,7 +46,7 @@
         { name: '1080p', label: '1080p' },
         { name: '720p', label: '720p' },
         { name: '480p', label: '480p' },
-        { name: 'audio', label: '仅音频' }
+        { name: 'audio', label: '仅音频 (MP3)' }
     ];
     const PRESET_STORAGE_KEY = 'mediadock.preset';
     const DEFAULT_PRESET = 'best';
@@ -263,7 +263,8 @@
     function rowTextFor(task) {
         const title = shortTitle(task.title || task.url || '');
         if (task.status === 'downloading') {
-            if (task.speed === 'merging') return '🔄 ' + title + ' · 合并中';
+            // FFmpeg 阶段：合并（视频）或提取音频（仅音频预设）
+            if (task.speed === 'merging') return '🔄 ' + title + ' · 处理中';
             let text = '⏳ ' + title + ' · ' + pct(task.percent) + '%';
             if (task.speed) text += ' · ' + task.speed;
             if (task.eta) text += ' · ETA ' + task.eta;

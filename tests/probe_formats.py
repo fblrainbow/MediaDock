@@ -46,6 +46,8 @@ PAYLOAD = (
 
 URL = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 SELECTOR_720 = "bv*[height<=720]+ba/b[height<=720]"
+SELECTOR_AUDIO = "bestaudio/best"
+AUDIO_FORMAT = "mp3"
 
 # 必须在 import server 之前：模块导入时就会 bootstrap 一次
 os.environ["MEDIADOCK_DB"] = ":memory:"
@@ -241,6 +243,31 @@ def main():
             command = runs[1].command
             checks["preset_argv_format"] = (
                 command[command.index("-f") + 1] == SELECTOR_720)
+
+        # 6b) 仅音频必须产出真实 MP3（Stage-012）：argv 走 -x --audio-format mp3
+        code, raw = request(port, "/download?url=" + quote_url(URL)
+                            + "&preset=audio")
+        audio_id = as_json(raw).get("task_id", "")
+        checks["audio_preset_200"] = code == 200 and bool(audio_id)
+        checks["audio_preset_expression"] = bool(audio_id) and \
+            srv.scheduler.format_for(audio_id) == SELECTOR_AUDIO
+        checks["audio_preset_format_recorded"] = bool(audio_id) and \
+            srv.scheduler.audio_format_for(audio_id) == AUDIO_FORMAT
+        deadline = time.monotonic() + 20
+        while srv.scheduler.active_count() and time.monotonic() < deadline:
+            time.sleep(0.02)
+        if len(runs) >= 3:
+            command = runs[2].command
+            checks["audio_argv_extract"] = "--extract-audio" in command
+            checks["audio_argv_format_mp3"] = (
+                "--audio-format" in command
+                and command[command.index("--audio-format") + 1] == AUDIO_FORMAT)
+            checks["audio_argv_quality"] = (
+                "--audio-quality" in command
+                and command[command.index("--audio-quality") + 1] == "0")
+            checks["audio_argv_no_merge"] = \
+                "--merge-output-format" not in command
+            checks["audio_argv_url_last"] = command[-1] == URL
 
         # 7) 明确错误：未知 id、注入形状、探测失败
         code, raw = request(port, "/download?url=" + quote_url(URL)

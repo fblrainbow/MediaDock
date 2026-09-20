@@ -1,19 +1,19 @@
 {
-  "base": "http://127.0.0.1:63242",
+  "base": "http://127.0.0.1:57398",
   "bind": "127.0.0.1",
   "port_mode": "ephemeral",
   "ffmpeg": "C:\\Tools\\ffmpeg\\bin\\ffmpeg.exe",
-  "source_video": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-media-rhfkkxpi\\downloads\\probe clip [MEDIAPROBE1].mp4",
+  "source_video": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-media-v8yrifrr\\downloads\\probe clip [MEDIAPROBE1].mp4",
   "source_container_codec": "-c:v mpeg4 -q:v 8 -c:a aac -b:a 96k",
-  "download_dir": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-media-rhfkkxpi\\downloads",
+  "download_dir": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-media-v8yrifrr\\downloads",
   "targets": [
     "mp3",
     "m4a",
     "wav"
   ],
   "outputs": [
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\mediadock-media-rhfkkxpi\\downloads\\probe clip [MEDIAPROBE1].mp3",
-    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\mediadock-media-rhfkkxpi\\downloads\\probe clip [MEDIAPROBE1].wav"
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\mediadock-media-v8yrifrr\\downloads\\probe clip [MEDIAPROBE1].mp3",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\mediadock-media-v8yrifrr\\downloads\\probe clip [MEDIAPROBE1].wav"
   ],
   "checks": {
     "targets_listed": true,

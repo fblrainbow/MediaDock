@@ -69,16 +69,28 @@ def default_download_dir() -> str:
 
 def build_command(ytdlp: str, download_dir: str, url: str,
                   ffmpeg_path: str = "",
-                  format_expr: str = "") -> List[str]:
+                  format_expr: str = "",
+                  audio_format: str = "") -> List[str]:
     """argv list for one download; no shell, URL is always a single argument.
 
     `format_expr` comes from `core_formats.selector_for()` (constants or a
     validated format id), never from raw user text; empty keeps the frozen
     Stage-001 policy.
+
+    `audio_format` (Stage-012) is a container name from the fixed preset table
+    (`mp3`). When set, FFmpeg extracts audio instead of merging to MP4, so the
+    produced file is a real audio file rather than the platform's native audio
+    container. Empty keeps the frozen Stage-001 policy.
     """
     expression = str(format_expr or "").strip() or FORMAT_EXPR
-    command = [ytdlp, "-f", expression, "--merge-output-format", "mp4",
-               "--newline", "--no-playlist"]
+    container = str(audio_format or "").strip()
+    command = [ytdlp, "-f", expression]
+    if container:
+        command += ["--extract-audio", "--audio-format", container,
+                    "--audio-quality", "0"]
+    else:
+        command += ["--merge-output-format", "mp4"]
+    command += ["--newline", "--no-playlist"]
     if ffmpeg_path:
         command += ["--ffmpeg-location", str(ffmpeg_path)]
     command += ["-P", download_dir, url]
@@ -120,11 +132,14 @@ class DownloadEngine:
             return self._finish_paused(task_id)
         command = build_command(self.ytdlp, self.download_dir, url,
                                 self.ffmpeg,
-                                getattr(control, "format_expr", ""))
+                                getattr(control, "format_expr", ""),
+                                getattr(control, "audio_format", ""))
         self._log(f"Task {task_id} start: {url}")
         self._log(f"yt-dlp: {self.ytdlp}")
         if getattr(control, "format_expr", ""):
             self._log(f"format: {control.format_expr}")
+        if getattr(control, "audio_format", ""):
+            self._log(f"audio: extract to {control.audio_format}")
         if self.ffmpeg:
             self._log(f"ffmpeg: {self.ffmpeg}")
         try:
