@@ -17,6 +17,10 @@ from core_formats import (DEFAULT_PRESET, ERROR_FORMAT_NOT_AVAILABLE,
                           selector_for, validate_format_id)
 from core_listing import (build_history, build_task_list, normalize_limit,
                           HISTORY_DEFAULT_LIMIT, HISTORY_STATUSES)
+from core_media import (AUDIO_TASK_TYPE, ERROR_INVALID_TARGET,
+                        ERROR_SOURCE_NOT_FOUND, ERROR_SOURCE_OUTSIDE,
+                        AudioProcessor, find_source_file, resolve_target,
+                        targets_public)
 from core_manager import TaskManager
 from core_parse import MERGE_RE, PROGRESS_RE
 from core_platform import detect_platform
@@ -51,6 +55,10 @@ FORMATS_RUNNER = None
 FORMATS_PROBE_FACTORY = None
 FORMATS_CACHE = {}
 FORMATS_CACHE_LIMIT = 20
+
+# Stage-009: media (audio) conversion seams.
+MEDIA_POPEN_FACTORY = None
+MEDIA_PROCESSOR_FACTORY = None
 
 _log_fp = None
 
@@ -291,6 +299,87 @@ def resolve_format_choice(url, preset_raw, format_id_raw):
     return selector_for(preset), "", ""
 
 
+def media_processor_factory():
+    """How the scheduler builds the media path (test seam, Stage-009)."""
+    if MEDIA_PROCESSOR_FACTORY is not None:
+        return MEDIA_PROCESSOR_FACTORY()
+    return AudioProcessor(manager, ffmpeg=FFMPEG, download_dir=DOWNLOAD_DIR,
+                          popen_factory=MEDIA_POPEN_FACTORY, logger=log)
+
+
+def task_engine():
+    """One run: audio jobs go to the media processor, everything else to yt-dlp."""
+    download = DownloadEngine(manager, ytdlp=YT_DLP, download_dir=DOWNLOAD_DIR,
+                              ffmpeg=FFMPEG, logger=log)
+
+    class _TaskEngine:
+        def run(self, task_id, url, control=None):
+            job = dict(getattr(control, "media_job", {}) or {})
+            if job.get("kind") == "audio":
+                return media_processor_factory().run(task_id, job, control)
+            return download.run(task_id, url, control)
+
+    return _TaskEngine()
+
+
+def set_media_processor(factory):
+    """Test/harness seam: replace how the media processor is built."""
+    global MEDIA_PROCESSOR_FACTORY
+    MEDIA_PROCESSOR_FACTORY = factory
+
+
+def audio_targets_info():
+    """`GET /audio` discovery payload (Stage-009)."""
+    from core_media import DEFAULT_TARGET
+    return {"targets": targets_public(), "default": DEFAULT_TARGET,
+            "audio_type": AUDIO_TASK_TYPE}
+
+
+def audio_action(source_task_id, target_raw, source_raw=""):
+    """`POST /audio`: validate, then create one media Task.
+
+    Returns `(body, http_code)`. The HTTP input can only pick a target name
+    and point at a file that already lives inside the download directory.
+    """
+    if not source_task_id:
+        return _error("missing_task_id", "Missing task_id", 400)
+    if not TASK_ID_RE.match(str(source_task_id)):
+        return _error("invalid_task_id", "task_id must be 1-64 chars of "
+                      "[A-Za-z0-9_-]", 400, str(source_task_id))
+    target, code, message = resolve_target(target_raw)
+    if target is None:
+        return _error(code or ERROR_INVALID_TARGET, message, 400)
+    source_task = manager.get(str(source_task_id))
+    if source_task is None:
+        return _error("task_not_found", "task not found", 404,
+                      str(source_task_id))
+    if source_task.type != "download":
+        return _error("not_a_download_task",
+                      "only a download task can be converted", 409,
+                      source_task.task_id)
+    if source_task.status != "completed":
+        return _error("not_completed",
+                      f"task is {source_task.status}; wait for completed", 409,
+                      source_task.task_id)
+    path, code, message = find_source_file(DOWNLOAD_DIR, source_task.url,
+                                           source_raw)
+    if path == "":
+        if code == ERROR_SOURCE_OUTSIDE:
+            return _error(code, message, 400, source_task.task_id)
+        if code == ERROR_SOURCE_NOT_FOUND:
+            return _error(code, message, 404, source_task.task_id)
+        return _error(code or ERROR_SOURCE_NOT_FOUND, message, 400,
+                      source_task.task_id)
+    job = {"kind": "audio", "source": path, "target": target.name,
+           "source_task_id": source_task.task_id}
+    created = scheduler.submit(source_task.url,
+                               platform=source_task.platform,
+                               media_job=job, task_type=AUDIO_TASK_TYPE)
+    return {"task_id": created["task_id"],
+            "source_task_id": source_task.task_id,
+            "target": target.name, "source": path}, 200
+
+
 def storage_info():
     """Payload for /health and /tasks (Stage-005.md 5.4)."""
     if storage is None:
@@ -335,6 +424,8 @@ def bootstrap(db_path=None, config=None):
     scheduler = Scheduler(manager, _make_engine,
                           max_active=CONFIG.max_active_tasks,
                           logger=log, download_dir=DOWNLOAD_DIR)
+    # Stage-009：一次运行按 control.media_job 路由到 yt-dlp 或 FFmpeg
+    scheduler.set_engine_factory(task_engine)
     tasks = manager._tasks
     tasks_lock = manager._lock
     refresh_dependencies()
@@ -637,6 +728,10 @@ class Handler(BaseHTTPRequestHandler):
                                        format_expr=expression)
             self._json({"task_id": created["task_id"]})
             return
+        # 音频目标列表 (Stage-009)：只列出固定表，不执行任何转换
+        if parsed.path == "/audio":
+            self._json(audio_targets_info())
+            return
         # 其他路径
         body, code = _error("not_found", "Not Found", 404)
         self._json(body, code=code)
@@ -673,6 +768,12 @@ class Handler(BaseHTTPRequestHandler):
             return
         if parsed.path == "/delete":
             body, code = delete_action(payload.get("task_id"))
+        elif parsed.path == "/audio":
+            params = parse_qs(parsed.query)
+            body, code = audio_action(
+                payload.get("task_id"),
+                params.get("target", [None])[0] or payload.get("target"),
+                payload.get("source") or "")
         else:
             body, code = control_action(parsed.path, payload.get("task_id"))
         self._json(body, code=code)

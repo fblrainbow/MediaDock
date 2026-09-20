@@ -121,9 +121,11 @@ class TaskManager:
         task.updated_at = self._clock()
 
     # -- lifecycle --------------------------------------------------
-    def create(self, url: str, platform: str = "youtube") -> Task:
+    def create(self, url: str, platform: str = "youtube",
+               task_type: str = "download") -> Task:
+        kind = str(task_type or "download").strip() or "download"
         task = Task(task_id=self._id_factory(), url=url, platform=platform,
-                    status="pending",
+                    type=kind, status="pending",
                     created_at=self._clock(), updated_at=self._clock())
         with self._lock:
             self._tasks[task.task_id] = task

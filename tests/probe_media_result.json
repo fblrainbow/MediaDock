@@ -1,0 +1,46 @@
+{
+  "base": "http://127.0.0.1:51380",
+  "bind": "127.0.0.1",
+  "port_mode": "ephemeral",
+  "ffmpeg": "C:\\Tools\\ffmpeg\\bin\\ffmpeg.exe",
+  "source_video": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-media-tnbvy4g5\\downloads\\probe clip [MEDIAPROBE1].mp4",
+  "source_container_codec": "-c:v mpeg4 -q:v 8 -c:a aac -b:a 96k",
+  "download_dir": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-media-tnbvy4g5\\downloads",
+  "targets": [
+    "mp3",
+    "m4a",
+    "wav"
+  ],
+  "outputs": [
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\mediadock-media-tnbvy4g5\\downloads\\probe clip [MEDIAPROBE1].mp3",
+    "C:\\Users\\Administrator\\AppData\\Local\\Temp\\mediadock-media-tnbvy4g5\\downloads\\probe clip [MEDIAPROBE1].wav"
+  ],
+  "checks": {
+    "targets_listed": true,
+    "audio_mp3_created": true,
+    "audio_mp3_completed": true,
+    "audio_mp3_type": true,
+    "audio_mp3_file": true,
+    "audio_mp3_magic": true,
+    "audio_mp3_marker": true,
+    "audio_mp3_path_inside": true,
+    "audio_wav_created": true,
+    "audio_wav_completed": true,
+    "audio_wav_type": true,
+    "audio_wav_file": true,
+    "audio_wav_magic": true,
+    "audio_wav_marker": true,
+    "audio_wav_path_inside": true,
+    "bad_source_accepted_for_conversion": true,
+    "bad_source_fails": true,
+    "bad_source_error_code": true,
+    "bad_source_no_output": true,
+    "missing_task_id_400": true,
+    "invalid_target_400": true,
+    "outside_source_400": true,
+    "unknown_task_404": true,
+    "missing_ffmpeg_fails": true,
+    "history_has_audio_type": true
+  },
+  "failed_checks": []
+}

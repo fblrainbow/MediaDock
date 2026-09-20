@@ -1,9 +1,9 @@
 {
-  "base": "http://127.0.0.1:59155",
+  "base": "http://127.0.0.1:50401",
   "bind": "127.0.0.1",
   "port_mode": "ephemeral",
-  "fake_ytdlp": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-hsgfflsb\\yt-dlp-ok.bat",
-  "argv_file": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-hsgfflsb\\argv.txt",
+  "fake_ytdlp": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-0pspfaao\\yt-dlp-ok.bat",
+  "argv_file": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-0pspfaao\\argv.txt",
   "probe_argv": [
     "--dump-single-json",
     "--skip-download",

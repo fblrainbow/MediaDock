@@ -1,5 +1,5 @@
 {
-  "base": "http://127.0.0.1:56820",
+  "base": "http://127.0.0.1:55064",
   "bind": "127.0.0.1",
   "port_mode": "ephemeral",
   "engine_stub": "instant engine (process spawn replaced)",
