@@ -1,9 +1,9 @@
 {
-  "base": "http://127.0.0.1:64876",
+  "base": "http://127.0.0.1:64131",
   "bind": "127.0.0.1",
   "port_mode": "ephemeral",
-  "fake_ytdlp": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-fsdb8cdb\\yt-dlp-ok.bat",
-  "argv_file": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-fsdb8cdb\\argv.txt",
+  "fake_ytdlp": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-e_r4q067\\yt-dlp-ok.bat",
+  "argv_file": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-e_r4q067\\argv.txt",
   "probe_argv": [
     "--dump-single-json",
     "--skip-download",
@@ -30,18 +30,6 @@
       "FAKE-YTDLP",
       "-f",
       "bv*[height<=720]+ba/b[height<=720]",
-      "--merge-output-format",
-      "mp4",
-      "--newline",
-      "--no-playlist",
-      "-P",
-      "E:\\GitHub\\MediaDock\\downloads",
-      "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-    ],
-    [
-      "FAKE-YTDLP",
-      "-f",
-      "bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080][ext=mp4]",
       "--merge-output-format",
       "mp4",
       "--newline",

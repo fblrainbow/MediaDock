@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-20 12:15:35",
+  "generated_at": "2026-09-20 12:39:03",
   "release": {
     "app": "1.0.0",
     "api": "1",
@@ -125,16 +125,16 @@
     "delete.then_404": "code=404",
     "delete.repeat_404": "code=404",
     "restart.completed_before": "status=completed",
-    "restart.backup_created": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-release-2_ry9lzc\\tasks.db.backup",
+    "restart.backup_created": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-release-_r_ztk8u\\tasks.db.backup",
     "restart.completed_survives": "status=completed",
     "restart.downloading_interrupted": "status=error error_code=interrupted",
     "restart.paused_stays_paused": "status=paused",
-    "restart.storage_ok": "{\"kind\": \"sqlite\", \"db\": \"C:\\\\Users\\\\ADMINI~1\\\\AppData\\\\Local\\\\Temp\\\\mediadock-release-2_ry9lzc\\\\tasks.db\", \"schema_version\": 2, \"degraded\": false, \"reason\": \"\"}",
+    "restart.storage_ok": "{\"kind\": \"sqlite\", \"db\": \"C:\\\\Users\\\\ADMINI~1\\\\AppData\\\\Local\\\\Temp\\\\mediadock-release-_r_ztk8u\\\\tasks.db\", \"schema_version\": 2, \"degraded\": false, \"reason\": \"\"}",
     "rollback.db_restore_history": "code=200 total=3",
-    "rollback.degraded_memory": "{\"kind\": \"memory\", \"db\": \"C:\\\\Users\\\\ADMINI~1\\\\AppData\\\\Local\\\\Temp\\\\mediadock-release-2_ry9lzc\\\\corrupt.db\", \"schema_version\": 0, \"degraded\": true, \"reason\": \"migration failed: file is not a database\"}",
+    "rollback.degraded_memory": "{\"kind\": \"memory\", \"db\": \"C:\\\\Users\\\\ADMINI~1\\\\AppData\\\\Local\\\\Temp\\\\mediadock-release-_r_ztk8u\\\\corrupt.db\", \"schema_version\": 0, \"degraded\": true, \"reason\": \"migration failed: file is not a database\"}",
     "rollback.degraded_version": "code=200 version={\"app\": \"1.0.0\", \"api\": \"1\", \"userscript\": \"5.2\", \"schema\": 0}",
     "rollback.degraded_accepts_task": "code=200"
   },
-  "duration_seconds": 1.38,
-  "temp_dir": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-release-2_ry9lzc"
+  "duration_seconds": 1.31,
+  "temp_dir": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-release-_r_ztk8u"
 }
