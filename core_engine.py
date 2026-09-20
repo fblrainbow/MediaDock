@@ -135,7 +135,11 @@ class DownloadEngine:
                                                   "CREATE_NO_WINDOW", 0)
             process = self._popen_factory(command, **kwargs)
             control.attach_process(process)
-            for raw in process.stdout:
+            # `Popen.stdout` 的声明类型是 `IO[Any] | None`（非 PIPE 时为 None）。
+            # 这里始终请求了 PIPE，`or ()` 只用于类型收窄，并兜底没有 stdout 的测试桩：
+            # 没有输出行时直接等进程结束，仍由 returncode 决定最终状态。
+            stream = process.stdout or ()
+            for raw in stream:
                 if control.cancel_requested() or control.pause_requested():
                     terminate_tree(process, self._log)
                     break
