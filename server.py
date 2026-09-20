@@ -16,6 +16,7 @@ from core_formats import (DEFAULT_PRESET, ERROR_FORMAT_NOT_AVAILABLE,
                           ERROR_INVALID_FORMAT, FormatsProbe,
                           format_id_present, preset_satisfied, resolve_preset,
                           selector_for, validate_format_id)
+from core_instance import take_over_port
 from core_listing import (build_history, build_task_list, normalize_limit,
                           HISTORY_DEFAULT_LIMIT, HISTORY_STATUSES)
 from core_media import (AUDIO_TASK_TYPE, ERROR_INVALID_TARGET,
@@ -845,17 +846,73 @@ def run_check_config(argv):
     return 0 if config.ok() and snapshot["ok"] else 1
 
 
+def bind_server():
+    """Bind the HTTP server; returns `(server_or_None, error_text)`.
+
+    `MediaDockServer.allow_reuse_address = False` (Stage-003) means a second
+    instance fails with `WinError 10048` instead of silently sharing the port.
+    """
+    try:
+        return MediaDockServer((HOST, PORT), Handler), ""
+    except OSError as exc:
+        return None, str(exc)
+
+
+def free_port_for_start(restarted):
+    """Make `HOST:PORT` available for this start (Stage-011).
+
+    `True` when the caller may bind. Only a process that really holds our port
+    **and** looks like a MediaDock `server.py` is stopped; anything else is
+    reported and left alone.
+    """
+    takeover = take_over_port(HOST, PORT, log)
+    status = takeover["status"]
+    if status in ("free", "killed"):
+        if status == "killed":
+            log(f"previous instance pid {takeover['pid']} stopped "
+                f"({takeover['detail']})")
+        return True, takeover
+    if status == "foreign":
+        log(f"端口 {HOST}:{PORT} 被 pid {takeover['pid']} "
+            f"({takeover['name']}) 占用，它不是 MediaDock 服务，已放弃接管。",
+            level="warning")
+        log(f"该进程命令行：{takeover['command_line']}", level="warning")
+    elif status == "unknown":
+        log(f"端口 {HOST}:{PORT} 被占用，但无法识别占用者。", level="warning")
+    else:
+        log(f"接管 {HOST}:{PORT} 失败：{takeover['detail']}", level="warning")
+    if restarted:
+        log("提示：可手动确认后结束占用进程，或改配置里的 port 再启动。",
+            level="warning")
+    return False, takeover
+
+
 def main(argv=None):
     argv = list(sys.argv[1:] if argv is None else argv)
     if "--check-config" in argv:
         sys.exit(run_check_config(argv))
-    try:
-        server = MediaDockServer((HOST, PORT), Handler)
-    except OSError as exc:
-        log(f"ERROR: cannot bind {HOST}:{PORT} ({exc})", level="error")
-        log("另一个 MediaDock 实例可能已在运行；请先结束它再启动。")
-        log("提示：Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" "
-            "| Where-Object { $_.CommandLine -like '*server.py*' }")
+    unknown = [arg for arg in argv if arg not in ("--restart",)]
+    if unknown:
+        print(f"unknown option: {unknown[0]}")
+        sys.exit(2)
+    restarted = "--restart" in argv
+
+    # --restart：先结束旧实例再启动（显式要求，不等待端口冲突）
+    if restarted:
+        ok, _ = free_port_for_start(True)
+        if not ok:
+            sys.exit(2)
+
+    server, error = bind_server()
+    if server is None and not restarted:
+        # 端口被占用：只接管「确实持有本端口且是 MediaDock server.py」的进程
+        ok, _ = free_port_for_start(False)
+        if ok:
+            server, error = bind_server()
+    if server is None:
+        log(f"ERROR: cannot bind {HOST}:{PORT} ({error})", level="error")
+        log("另一个 MediaDock 实例可能已在运行；可用 "
+            "`python server.py --restart` 先结束它再启动。")
         sys.exit(2)
     log("MediaDock server started")
     log(f"version: {APP_VERSION}")

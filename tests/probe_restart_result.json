@@ -1,0 +1,22 @@
+{
+  "generated_at": "2026-09-20 13:00:13",
+  "checks": {
+    "first_start_serves_health": true,
+    "first_start_is_silent": true,
+    "first_owner_recognised_as_mediadock": true,
+    "first_owner_pid_positive": true,
+    "second_start_serves_health": true,
+    "second_start_still_running": true,
+    "previous_instance_stopped": true,
+    "port_owner_changed": true,
+    "health_reports_version": true,
+    "old_instance_was_not_the_server": true,
+    "second_instance_serves_tasks": true,
+    "second_instance_stopped": true,
+    "restart_on_free_port_works": true,
+    "third_instance_stopped": true
+  },
+  "passed": 14,
+  "total": 14,
+  "ok": true
+}

@@ -57,6 +57,9 @@ C:\Users\Administrator\Envs\mediadock\Scripts\python.exe tests\release_check.py
 - [ ] 打开两个 YouTube 标签页，确认任务列表同步、排序一致。
 - [ ] 结束服务后重启，确认 `interrupted` 语义与 `/history` 历史记录符合预期。
 - [ ] 检查 `MediaDock-server.log` 中没有未脱敏的完整 URL 或异常堆栈。
+- [ ] **启动接管**：先启动一个实例，再用 `python server.py --restart` 启动第二个，
+      确认旧实例被结束、新实例正常服务（`/health` 200）；再确认旧实例里运行中的任务
+      变为 `error` + `interrupted`，可重试。
 
 **其他必跑命令**
 
@@ -64,7 +67,7 @@ C:\Users\Administrator\Envs\mediadock\Scripts\python.exe tests\release_check.py
 C:\Users\Administrator\Envs\mediadock\Scripts\python.exe -m py_compile server.py core_release.py core_config.py
 C:\Users\Administrator\Envs\mediadock\Scripts\python.exe -m unittest discover -s tests -t .
 C:\Users\Administrator\Envs\mediadock\Scripts\python.exe tests\check_userscript.py
-# 8 个探针
+# 9 个探针（probe_restart.py 会真实启停两个服务并验证端口接管）
 Get-ChildItem tests\probe_*.py | ForEach-Object { C:\Users\Administrator\Envs\mediadock\Scripts\python.exe $_.FullName }
 ```
 

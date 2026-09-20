@@ -1,6 +1,6 @@
 # MediaDock
 
-> 版本 **1.0.0**（用户脚本 `5.2`）｜本地媒体下载与处理平台｜Windows + Python 3.13 + 标准库
+> 版本 **1.0.1**（用户脚本 `5.2`）｜本地媒体下载与处理平台｜Windows + Python 3.13 + 标准库
 >
 > MediaDock 在 YouTube 页面放一个下载按钮，把下载任务交给本机 Python 服务：
 > yt-dlp 下载、FFmpeg 合并/转音频、SQLite 记录历史，所有页面共享同一份任务列表。
@@ -34,6 +34,7 @@ flowchart LR
 | 清晰度选择 | `/formats` 探测，Best/1080p/720p/480p/仅音频 | Stage-008 |
 | 转音频 | 已完成的视频转 MP3/M4A/WAV，同样进任务列表 | Stage-009 |
 | 发布与回归 | 一条命令给出发布结论 + 文档 + 回滚路径 | Stage-010 |
+| 单实例接管 | 启动时若端口被旧 MediaDock 实例占用，自动结束旧实例再启动 | Stage-011 |
 
 ---
 
@@ -46,8 +47,11 @@ C:\Users\Administrator\Envs\mediadock\Scripts\python.exe -m pip install -r requi
 # 2) 配置检查（不启动服务；退出码 0 = 可用）
 C:\Users\Administrator\Envs\mediadock\Scripts\python.exe server.py --check-config
 
-# 3) 启动服务
+# 3) 启动服务（端口被旧的 MediaDock 实例占用时会自动接管）
 C:\Users\Administrator\Envs\mediadock\Scripts\python.exe server.py
+
+# 3b) 想先主动结束旧实例再启动
+C:\Users\Administrator\Envs\mediadock\Scripts\python.exe server.py --restart
 
 # 4) 健康检查
 curl.exe http://127.0.0.1:8765/health
@@ -135,6 +139,7 @@ core_deps.py       yt-dlp/FFmpeg/Python 依赖诊断
 core_engine.py     yt-dlp 下载引擎（argv 唯一构造点）
 core_files.py      文件归属、路径边界、临时文件清理
 core_formats.py    清晰度预设、探测、选择器拼装
+core_instance.py   单实例接管：定位并结束占用端口的旧实例
 core_listing.py    /tasks 与 /history 载荷、排序契约
 core_manager.py    Task 内存模型与状态机
 core_media.py      FFmpeg 音频转换（媒体处理任务）
@@ -147,7 +152,7 @@ core_store.py      SQLite 存储、迁移、事件、清理
 core_task.py       Task 数据结构
 MediaDock.js       Tampermonkey 用户脚本
 docs/              安装、配置、脚本、变更日志、限制、升级回滚、发布清单
-tests/             335 个单元测试 + 8 个探针 + JS 结构检查 + 发布检查
+tests/             355 个单元测试 + 9 个探针 + JS 结构检查 + 发布检查
 ```
 
 ---

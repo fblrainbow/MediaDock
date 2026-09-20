@@ -59,6 +59,10 @@
 | --- | --- | --- |
 | 默认只监听回环地址 | 需要局域网访问必须显式 `allow_lan=true`，且会记 warning | D-004 |
 | 无鉴权 | 依赖「只监听 127.0.0.1」这一前提；开启 `allow_lan` 等于对局域网开放无鉴权 API | Stage-006 |
+| 单实例 | 同一端口只跑一个实例（关闭端口复用）；启动时若端口被旧 MediaDock 占用会自动接管并结束旧实例 | Stage-003、Stage-011 |
+| 接管会中断旧任务 | 被接管的旧实例里 `downloading`/`pending` 任务变为 `error` + `interrupted`，需手动重试 | Stage-005、Stage-011 |
+| 接管依赖 PowerShell | 定位端口占用者用 `Get-NetTCPConnection`/`Get-CimInstance`；不可用时退化为退出码 2，不猜测、不乱杀 | Stage-011 |
+| 不接管非 MediaDock 进程 | 端口被其他程序占用时只报告 PID/进程名/命令行，不自动结束 | Stage-011 |
 | 无安装包 | 手动启动或自建快捷方式/计划任务（D-014） | D-014 |
 | 无 Windows 服务 | 不注册系统服务，避免管理员权限与卸载残留 | D-014 |
 | 无 Docker | 明确不在范围内 | 计划 §4.2 |

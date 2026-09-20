@@ -65,9 +65,31 @@ C:\Users\Administrator\Envs\mediadock\Scripts\python.exe server.py
 启动日志会打印版本、监听地址、下载目录、yt-dlp/FFmpeg 位置、并发上限、
 存储 schema 与依赖摘要。服务默认监听 `127.0.0.1:8765`。
 
-> 端口已被占用时进程以退出码 `2` 结束并记录明确日志（不会静默共享端口）。
-> 结束旧进程：
-> `Get-CimInstance Win32_Process -Filter "Name='python.exe'" | Where-Object { $_.CommandLine -like '*server.py*' }`
+### 3.1 端口被占用时：自动接管（v1.0.1）
+
+MediaDock 是单实例服务（关闭端口复用，避免两个进程各持一份任务表）。
+启动时如果 `127.0.0.1:8765` 已被占用，会按占用者身份分别处理：
+
+| 占用者 | 行为 |
+| --- | --- |
+| 本机的旧 MediaDock 实例（python/pythonw 运行的 `server.py`） | **自动接管**：记录日志 → 结束该进程树 → 等待端口释放 → 继续启动 |
+| 其他程序 | **不接管**：退出码 `2`，并打印占用者的 PID、进程名与命令行 |
+
+想主动先结束旧实例再启动（不等冲突）：
+
+```powershell
+C:\Users\Administrator\Envs\mediadock\Scripts\python.exe server.py --restart
+```
+
+注意：
+
+- 接管会**中断旧实例正在运行的任务**：这些任务在下一次启动时变为
+  `error` + `error_code=interrupted`，需要在页面上点「重试」（Stage-005 语义不变）。
+- 判定「是不是 MediaDock」的依据是「持有该端口的进程名是 python/pythonw
+  **且**命令行里运行的是 `server.py`」；不满足就绝不结束。
+- 接管依赖系统自带的 PowerShell（`Get-NetTCPConnection` / `Get-CimInstance`）。
+  取不到占用者信息时不会乱杀，退化为退出码 `2` 并提示手动处理。
+- 想换端口：改 `config.json` 的 `port`（见 [configuration.md](configuration.md)）。
 
 ---
 
@@ -144,7 +166,8 @@ curl.exe http://127.0.0.1:8765/audio
 
 | 现象 | 原因 | 处理 |
 | --- | --- | --- |
-| 页面按钮提示「本地服务未启动」 | 服务未启动或端口被占用 | 启动服务并 `curl /health`；检查 `MediaDock-server.log` |
+| 页面按钮提示「本地服务未启动」 | 服务未启动或端口被占用 | 启动服务并 `curl /health`；或直接 `python server.py --restart` |
+| 启动日志出现 `cannot bind ... WinError 10048` | 端口被占用且占用者不是 MediaDock（不接管） | 按日志里的 PID/命令行确认占用程序；或改 `config.json` 的 `port` |
 | 面板提示「脚本 5.2 与服务端期望 5.x 不一致」 | 用户脚本与服务端版本不匹配 | 按 [userscript.md](userscript.md) 更新脚本 |
 | 任务失败 `ffmpeg_missing` | 未配置 FFmpeg | 填 `config.json` 的 `ffmpeg_path` 或加入 PATH |
 | 任务失败 `unsupported_platform` | URL 不属于已接入平台 | 当前只支持 YouTube（见 [known-limitations.md](known-limitations.md)） |
