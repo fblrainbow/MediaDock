@@ -24,6 +24,7 @@ from core_media import (AUDIO_TASK_TYPE, ERROR_INVALID_TARGET,
 from core_manager import TaskManager
 from core_parse import MERGE_RE, PROGRESS_RE
 from core_platform import detect_platform
+from core_release import APP_VERSION, release_info
 from core_scheduler import MAX_ACTIVE_TASKS, Scheduler
 from core_security import (body_within_limit, check_host_header, check_origin,
                            clip, redact)
@@ -602,9 +603,13 @@ class Handler(BaseHTTPRequestHandler):
         if not self._guard():
             return
         parsed = urlparse(self.path)
-        # 健康检查 (plan.md #9 / Stage-005 存储 / Stage-006 配置与依赖)
+        # 健康检查 (plan.md #9 / Stage-005 存储 / Stage-006 配置与依赖 /
+        # Stage-010 版本)：version 为增量字段，其余字段形状不变
         if parsed.path == "/health":
-            self._json({"status": "ok", "storage": storage_info(),
+            snapshot = storage_info()
+            self._json({"status": "ok",
+                        "version": release_info(snapshot.get("schema_version")),
+                        "storage": snapshot,
                         "config": config_public(CONFIG),
                         "dependencies": dependencies_info()})
             return
@@ -844,6 +849,7 @@ def main(argv=None):
             "| Where-Object { $_.CommandLine -like '*server.py*' }")
         sys.exit(2)
     log("MediaDock server started")
+    log(f"version: {APP_VERSION}")
     log(f"http://{HOST}:{PORT}")
     log(f"config: source={CONFIG.source} "
         f"path={CONFIG.path or '(built-in defaults)'} "

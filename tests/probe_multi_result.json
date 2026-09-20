@@ -1,27 +1,27 @@
 {
-  "base": "http://127.0.0.1:50070",
+  "base": "http://127.0.0.1:64899",
   "bind": "127.0.0.1",
   "port_mode": "ephemeral",
   "engine_stub": "scripted process (spawn replaced)",
   "task_count": 5,
   "fail_index": 1,
   "task_ids": [
-    "5df039d0",
-    "2afd2784",
-    "340a5f37",
-    "0e750c06",
-    "18c3dcd8"
+    "33636ec4",
+    "b658bc2c",
+    "2a2c945a",
+    "892634cf",
+    "ae2040be"
   ],
   "final_status": {
-    "2afd2784": "error",
-    "18c3dcd8": "completed",
-    "0e750c06": "completed",
-    "340a5f37": "completed",
-    "5df039d0": "completed"
+    "b658bc2c": "error",
+    "ae2040be": "completed",
+    "892634cf": "completed",
+    "2a2c945a": "completed",
+    "33636ec4": "completed"
   },
   "max_active_seen": 3,
   "max_queued_seen": 2,
-  "pending_samples": 64,
+  "pending_samples": 60,
   "ordering_ok": true,
   "commands_checked": 5,
   "format_expr": "bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080][ext=mp4]",

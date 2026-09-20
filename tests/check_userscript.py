@@ -81,7 +81,7 @@ def main():
         raise SystemExit(f"FAIL: unclosed {stack}")
 
     required = [
-        "@version      5.1",
+        "@version      5.2",
         "'/tasks'",
         "'/download?url='",
         "'/formats?url='",
@@ -111,10 +111,25 @@ def main():
         "已暂停",
         "已取消",
         "ERROR_HINTS",
+        # Stage-010：版本一致性与服务端版本展示锚点
+        "USERSCRIPT_VERSION = '5.2'",
+        "HEALTH_PATH = '/health'",
+        "versionWarning",
+        "serverVersion",
     ]
     missing = [needle for needle in required if needle not in src]
     if missing:
         raise SystemExit(f"FAIL: missing anchors {missing}")
+
+    # Stage-010：JS 声称的版本必须与 @version 头一致，避免发布期版本漂移
+    header = re.search(r"^//\s*@version\s+(\S+)\s*$", src, re.M)
+    declared = re.search(r"USERSCRIPT_VERSION = '([^']+)'", src)
+    if not header or not declared:
+        raise SystemExit("FAIL: userscript version anchors missing")
+    if header.group(1) != declared.group(1):
+        raise SystemExit(
+            f"FAIL: @version {header.group(1)} != USERSCRIPT_VERSION "
+            f"{declared.group(1)}")
 
     # 注释里可以提到"不再依赖 currentTaskId"；只检查真实代码
     no_comments = re.sub(r"//[^\n]*", "", src)

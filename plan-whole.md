@@ -16,11 +16,11 @@
 
 - 计划名称：MediaDock Local Media Platform
 - 计划文件：`plan-whole.md`
-- 当前版本：`0.2`
-- 当前状态：Stage-008 已完成，Stage-009 未开始
+- 当前版本：`0.3`
+- 当前状态：全部阶段已完成（Stage-001 ~ Stage-010），v1.0.0 已交付
 - 计划负责人：[待填写]
-- 最后更新时间：2026-09-19
-- 当前阻塞：需要在进入高影响阶段前确认相关决策门禁
+- 最后更新时间：2026-09-20
+- 当前阻塞：无（长期扩展候选见 `docs/release-notes.md`，需新阶段评估）
 - 目标平台：Windows 本地环境
 - 当前入口：Tampermonkey Userscript + Python Local HTTP Server
 
@@ -367,8 +367,8 @@ stateDiagram-v2
 | Stage-006 | 配置、依赖与安全加固 | 提升可配置性和本地安全 | `config.json`、依赖检查、安全测试 | Stage-001，建议 Stage-005 后完善 | 2026-09-19 |
 | Stage-007 | 平台 Adapter | 在不污染核心的情况下扩展平台 | Adapter 接口、YouTube Adapter、扩展预留 | Stage-002、Stage-006 | 2026-09-19 |
 | Stage-008 | 格式选择与 Formats API | 支持动态格式选择 | `/formats`、格式模型、前端选择器 | Stage-007 | 2026-09-19 |
-| Stage-009 | 音频模式与 Media Processor | 支持 Video to Audio 和统一媒体处理 | 媒体处理任务、MP3/M4A/WAV | Stage-005、Stage-006 | - |
-| Stage-010 | 发布、回归与长期扩展 | 固化交付、监控和后续扩展边界 | 发布包、文档、回滚方案、长期路线 | 全部必要阶段 | - |
+| Stage-009 | 音频模式与 Media Processor | 支持 Video to Audio 和统一媒体处理 | 媒体处理任务、MP3/M4A/WAV | Stage-005、Stage-006 | 2026-09-19 |
+| Stage-010 | 发布、回归与长期扩展 | 固化交付、监控和后续扩展边界 | 发布包、文档、回滚方案、长期路线 | 全部必要阶段 | 2026-09-20 |
 
 > 完成时间 `-` 表示尚未完成；阶段完成后填写实际完成日期。
 
@@ -714,7 +714,7 @@ flowchart TB
 | D-011 | 多任务最多 3 个并发，超出任务进入 pending 队列 | 已确认 | Stage-003 |
 | D-012 | 服务重启后的运行中任务状态和是否自动恢复 | 已确认（Stage-005 采用：不自动恢复；`downloading`/`pending` → `error` + `error_code=interrupted`，`paused` 保持暂停） | Stage-005 |
 | D-013 | 平台 Adapter 首批正式支持哪些平台 | 已确认：首批只正式支持 YouTube（`core_platform.DEFAULT_REGISTRY` 只注册 `YouTubeAdapter`）；其他平台显式拒绝 400 `unsupported_platform`；接新平台需 `ready=True` 的 Adapter 且单独评估鉴权 | Stage-007、Stage-008、Stage-010 |
-| D-014 | 发布方式：手动启动、开机启动脚本或安装包 | 待确认 | Stage-001、Stage-010 |
+| D-014 | 发布方式：手动启动、开机启动脚本或安装包 | 已确认（Stage-010 采用：手动启动 + 可选开机自启脚本，`docs/install.md` 给出启动文件夹与任务计划程序两种做法；不做安装包、不注册 Windows 服务，避免管理员权限与卸载残留） | Stage-001、Stage-010 |
 | D-015 | 未完成任务按百分比降序，完成任务按完成时间倒序 | 已确认 | Stage-003、Stage-005 |
 | D-016 | 默认最多显示 20 个；未完成超量不隐藏并允许面板滚动，完成任务超量默认折叠 | 已确认 | Stage-003 |
 | D-017 | 完成/失败任务暂时保留，可手动删除；URL/video ID 去重后续扩展 | 已确认 | Stage-003、Stage-005 |
@@ -742,9 +742,10 @@ flowchart TB
 | C-005 | Stage-006 引入配置层（`core_config.py`/`config.json`）、依赖诊断（`core_deps.py`）、安全纯函数（`core_security.py`）；`/health` 增加 `config`+`dependencies`；新增错误码 `forbidden_host`(403)/`forbidden_origin`(403)/`payload_too_large`(413)；新增配置键 `max_active_tasks`（默认 3）与 `purge_keep`（默认 200）；`--check-config` CLI | 落实 Stage-006 任务与 D-004 强化、D-014 的本地启动检查，并把依赖与安全边界固化为可测试契约 | Stage-006（下游 Stage-007/008/009/010） | 低（Task 字段、状态机与既有 API 形状不变；默认值与 Stage-004/005 一致） | 局部调整，已写入 Stage-006.md 与 `docs/stage006-migration.md` | 0.2 |
 | C-006 | Stage-007 引入平台层 `core_platform.py`（`PlatformInfo`/`PlatformAdapter`/`YouTubeAdapter`/`PlatformRegistry`/`DEFAULT_REGISTRY`/`detect_platform()`/`platform_names()`）；`server.py` 的 `/download` 改为「`validate_url`（由检测层代调用）→ `detect_platform` → `adapter.info` → `scheduler.submit(url, platform)`」且不再含平台字符串；新增错误码 `unsupported_platform`(400)/`platform_not_ready`(400)；D-013 决议为「首批只支持 YouTube」；既有 HTTP「正常下载」测试夹具 URL 从 `example.com` 迁移到 YouTube | 落实 Stage-007 任务 1-3：把平台判定收敛为单一真值，并把「不支持平台」从隐式失败升级为显式拒绝 | Stage-007（下游 Stage-008/009/010） | 低（Task 字段、状态机、状态集合、并发/文件策略与既有 API 形状不变；只新增 400 分支，并对未注册 host 的 URL 由 200 变为 400） | 局部调整，已写入 Stage-007.md 与 `docs/stage007-migration.md` | 0.2 |
 | C-007 | Stage-008 引入格式层 `core_formats.py`（`PRESETS`、`resolve_preset`、`validate_format_id`、`selector_for`、`build_probe_command`、`parse_probe_output`、`build_formats_payload`、`FormatsProbe`）；新增 `GET /formats?url=`；`/download` 接受 `preset`/`format_id`（必须先查 `/formats`）；新增错误码 `invalid_format`(400)/`format_not_available`(400)/`formats_unavailable`(502)；`TaskControl.format_expr` + `Scheduler` 发送期格式记录（**不新增 Task 字段、无 schema 变更**）；`MediaDock.js` 5.1 增加清晰度下拉 | 落实 Stage-008 任务 1-5：把格式选择固化为「固定预设表 + 探测结果校验 + 服务端拼装 argv」，并保持默认策略不变 | Stage-008（下游 Stage-009/010） | 低（Task 字段、状态机、状态集合、并发/文件策略、平台检测与既有 API 形状不变；不带格式参数的请求路径完全不变） | 局部调整，已写入 Stage-008.md 与 `docs/stage008-migration.md` | 0.2 |
+| C-008 | Stage-009 引入媒体处理层 `core_media.py`（`TARGETS`、`resolve_target`、`build_ffmpeg_command`、`output_path_for`、`find_source_file`、`parse_media_line`、`has_free_space`、`AudioProcessor`）；新增 `GET /audio`（目标表）与 `POST /audio?target=mp3|m4a|wav`（由已完成的下载任务创建 `type="audio"` 任务）；新增错误码 `invalid_audio_target`(400)/`not_a_download_task`(409)/`source_not_found`(404)/`source_outside_download_dir`(400) 与任务级 `ffmpeg_missing`/`ffmpeg_failed`/`output_missing`/`insufficient_space`；`TaskManager.create(task_type=)`、`Scheduler.submit/admit(media_job=)`、`TaskControl.media_job`、`server.task_engine()` 分流 | 落实 Stage-009 任务 1-5：把音频转换纳入与下载完全相同的 Task 状态机、控制接口、并发上限、存储与历史；目标名是唯一可从 HTTP 传入的转换参数 | Stage-009（下游 Stage-010） | 低（Task 字段、状态集合、存储 schema、API 错误格式、并发/文件策略与既有路由形状不变；无 `media_job` 的路径完全不变） | 局部调整，已写入 Stage-009.md 与 `docs/stage009-migration.md` | 0.2 |
+| C-009 | Stage-010 引入发布层 `core_release.py`（`APP_VERSION="1.0.0"`/`API_VERSION="1"`/`USERSCRIPT_VERSION="5.2"`、文档清单、变更日志解析、`config.example.json` 键对齐、`release_info()`）；`/health` 新增 `version {app, api, userscript, schema}`；新增发布门禁 `tests/release_check.py`（静态 + 真实 HTTP 全链路 + 重启 + 回滚演练 + 安全守卫，60 项）与 `tests/test_release.py`（27 用例）；`MediaDock.js` 5.2（显示服务端版本 + 版本不一致提示）；新增 `README.md` 与 7 份交付文档；D-014 决议为「手动启动 + 可选开机自启脚本」 | 落实 Stage-010 任务 1-5：形成可重复安装、验证、发布和回滚的交付流程，并把版本号收敛为单点真值 | Stage-010（收口全部阶段） | 低（`/health` 仅新增增量字段；Task 字段、状态机、存储 schema、排序与显示契约、既有 API 与错误码全部不变；无新增第三方依赖） | 局部调整，计划版本升级为 `0.3`，已写入 Stage-010.md 与 `docs/stage010-migration.md` | 0.3 |
 
 高影响变更必须在继续开发前更新 `plan-whole.md` 和受影响的 Stage 文件。低影响变更可以在 Stage 文件中记录，但不能改变总体契约而不升级版本。
-
 ---
 
 ## 14. Stage 文件生成规则

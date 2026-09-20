@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         MediaDock - Local YouTube Downloader
 // @namespace    http://tampermonkey.net/
-// @version      5.1
-// @description  一键调用本地 yt-dlp 下载 YouTube 视频，选择清晰度，并显示所有页共享的多任务进度列表 (MediaDock Stage-008)
+// @version      5.2
+// @description  一键调用本地 yt-dlp 下载 YouTube 视频，选择清晰度，并显示所有页共享的多任务进度列表 (MediaDock Stage-010)
 // @match        https://www.youtube.com/watch*
 // @match        https://www.youtube.com/shorts/*
 // @grant        GM_xmlhttpRequest
@@ -50,6 +50,12 @@
     ];
     const PRESET_STORAGE_KEY = 'mediadock.preset';
     const DEFAULT_PRESET = 'best';
+    // 版本一致性 (Stage-010)：必须与 @version 一致，服务端 /health.version.userscript
+    // 与之不同就提示更新脚本，避免旧脚本配新服务端产生难查的行为差异
+    const USERSCRIPT_VERSION = '5.2';
+    const HEALTH_PATH = '/health';
+    let serverVersion = null;
+    let versionWarning = '';
     // URL 归一化 (借鉴多合一脚本 cleanUrl)
     function cleanYouTubeUrl(raw) {
         try {
@@ -385,8 +391,10 @@
         });
         summaryEl.textContent = '运行 ' + (lastPayload.active_count || 0) +
             '/' + (lastPayload.active_limit || 3) +
-            ' · 排队 ' + (lastPayload.queued_count || 0);
+            ' · 排队 ' + (lastPayload.queued_count || 0) +
+            (serverVersion && serverVersion.app ? ' · v' + serverVersion.app : '');
         listEl.textContent = '';
+        if (versionWarning) listEl.appendChild(makeHintRow('⚠ ' + versionWarning));
         // 未完成任务全部渲染，超出可见行数时由面板内部滚动承载
         unfinished.forEach(function (t) {
             listEl.appendChild(makeRow(t));
@@ -409,8 +417,45 @@
     }
     function setServerOffline() {
         ensurePanel();
+        serverVersion = null;
+        versionWarning = '';
         summaryEl.textContent = '服务未启动（127.0.0.1:8765）';
         if (submitting) setButton('❌ 本地服务未启动', '#d32f2f');
+    }
+    // =========================
+    // 版本展示与脚本版本一致性 (Stage-010)
+    // 只读 /health.version，不改变任务列表与排序契约
+    // =========================
+    function loadServerVersion() {
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: SERVER + HEALTH_PATH,
+            timeout: 5000,
+            onload: function (response) {
+                if (response.status !== 200) return;
+                let data = null;
+                try {
+                    data = JSON.parse(response.responseText);
+                } catch (error) {
+                    console.warn('[MediaDock] 解析 /health 失败:', error);
+                    return;
+                }
+                serverVersion = data && data.version ? data.version : null;
+                versionWarning = '';
+                if (serverVersion && serverVersion.userscript &&
+                        serverVersion.userscript !== USERSCRIPT_VERSION) {
+                    versionWarning = '脚本 ' + USERSCRIPT_VERSION +
+                        ' 与服务端期望 ' + serverVersion.userscript +
+                        ' 不一致，请更新 MediaDock.js';
+                    console.warn('[MediaDock] ' + versionWarning);
+                }
+                if (lastPayload) renderList(lastPayload);
+            },
+            onerror: function () {
+                serverVersion = null;
+                versionWarning = '';
+            }
+        });
     }
     // =========================
     // 控制请求 (Stage-004)：POST 后立即刷新，按钮状态始终来自服务端
@@ -460,6 +505,7 @@
                 try {
                     const data = JSON.parse(response.responseText);
                     renderList(data);
+                    if (!serverVersion) loadServerVersion();
                 } catch (error) {
                     console.error('[MediaDock] 解析任务列表失败:', error);
                     setServerOffline();
