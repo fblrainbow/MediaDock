@@ -97,7 +97,12 @@ def main():
         "mediadock-preset",
         "PRESET_OPTIONS",
         "DEFAULT_PRESET",
-        "仅音频",
+        "仅音频 (MP3)",
+        # Stage-013：文件大小展示（任务行 + 下拉框）
+        "formatSize",
+        "size_bytes",
+        "applyPresetSizes",
+        "refreshPresetSizes",
         "yt-navigate-finish",
         "正在提交",
         "已加入任务列表",

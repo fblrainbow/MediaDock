@@ -6,10 +6,12 @@ and an injected formats runner as the metadata boundary.
 """
 import json
 import threading
+import time
 import unittest
 import urllib.error
 import urllib.request
 from http.server import ThreadingHTTPServer
+from typing import Any, Tuple
 from urllib.parse import quote
 
 import server as srv
@@ -17,10 +19,11 @@ from core_engine import FORMAT_EXPR, build_command
 from core_formats import (DEFAULT_PRESET, ERROR_FORMATS_UNAVAILABLE,
                           ERROR_INVALID_FORMAT, FormatsProbe,
                           build_formats_payload, build_probe_command,
-                          format_entry, parse_probe_output, preset_names,
-                          presets_public, resolve_preset, selector_for,
-                          validate_format_id)
-from tests.helpers import InstantEngine, install_factory, restore_engine
+                          format_entry, parse_probe_output, preset_choices,
+                          preset_names, preset_sizes, presets_public,
+                          resolve_preset, selector_for, validate_format_id)
+from tests.helpers import (CancelableEngine, InstantEngine, install_factory,
+                           restore_engine)
 
 URL = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
@@ -44,7 +47,8 @@ def raw_info():
              "fps": 30, "vcodec": "avc1.4d401e", "acodec": "none",
              "format_note": "480p"},
             {"format_id": "140", "ext": "m4a", "height": None, "vcodec": "none",
-             "acodec": "mp4a.40.2", "abr": 128.0, "format_note": "medium"},
+             "acodec": "mp4a.40.2", "abr": 128.0, "filesize": 3200000,
+             "format_note": "medium"},
             {"format_id": "18", "ext": "mp4", "height": 360, "width": 640,
              "fps": 30, "vcodec": "avc1.42001E", "acodec": "mp4a.40.2",
              "format_note": "360p"},
@@ -86,7 +90,7 @@ class TestPresets(unittest.TestCase):
         for item in presets_public():
             self.assertEqual(sorted(item),
                              ["audio_format", "kind", "label", "max_height",
-                              "name", "selector"])
+                              "name", "selector", "size_bytes"])
         by_name = {item["name"]: item for item in presets_public()}
         # 只有 audio 预设请求转码成 MP3（Stage-012），其余一律不转码
         self.assertEqual(by_name["audio"]["audio_format"], "mp3")
@@ -100,6 +104,8 @@ class TestPresets(unittest.TestCase):
         self.assertEqual(selector_for(), FORMAT_EXPR)
         for value in ("", "  ", None):
             preset, code, _ = resolve_preset(value)
+            if preset is None:
+                self.fail("empty value must resolve to the default preset")
             self.assertEqual((preset.name, code), ("best", ""))
 
     def test_unknown_preset_is_rejected(self):
@@ -110,6 +116,8 @@ class TestPresets(unittest.TestCase):
             self.assertTrue(message, value)
         # whitespace and case are normalised; anything outside the table is not
         preset, code, _ = resolve_preset("  1080P  ")
+        if preset is None:
+            self.fail("normalised value must resolve")
         self.assertEqual((preset.name, code), ("1080p", ""))
 
     def test_selector_for_uses_constants_only(self):
@@ -143,6 +151,8 @@ class TestProbeModel(unittest.TestCase):
     def test_parse_probe_output_handles_noise_and_garbage(self):
         info, code, message = parse_probe_output(json_out())
         self.assertEqual((code, message), ("", ""))
+        if info is None:
+            self.fail("valid JSON must parse into a payload")
         self.assertEqual(info["id"], "dQw4w9WgXcQ")
         info, code, _ = parse_probe_output(
             "WARNING: some notice\n" + json_out() + "\n")
@@ -192,7 +202,8 @@ class TestProbeModel(unittest.TestCase):
     def test_probe_fetch_paths(self):
         probe = FormatsProbe("yt-dlp.exe", runner=fake_runner())
         payload, code, _ = probe.fetch(URL)
-        self.assertIsNotNone(payload)
+        if payload is None:
+            self.fail("the fake runner must produce a payload")
         self.assertEqual((code, payload["platform"]), ("", "youtube"))
 
         probe = FormatsProbe("yt-dlp.exe",
@@ -211,6 +222,48 @@ class TestProbeModel(unittest.TestCase):
         payload, code, _ = probe.fetch(URL)
         self.assertIsNone(payload)
         self.assertEqual(code, ERROR_FORMATS_UNAVAILABLE)
+
+
+class TestPresetSizes(unittest.TestCase):
+    """T1301-T1305: per-preset size estimates from the probe payload."""
+
+    def _formats(self):
+        return [format_entry(entry) for entry in raw_info()["formats"]]
+
+    def test_video_preset_is_video_plus_audio(self):
+        formats = self._formats()
+        sizes = preset_sizes(formats)
+        video = next(f for f in formats if f["height"] == 1080)
+        audio = next(f for f in formats if f["vcodec"] == "none")
+        self.assertEqual(sizes["1080p"], video["filesize"] + audio["filesize"])
+        # 720p 的封顶不会选到 1080p 那个格式
+        small = next(f for f in formats if f["height"] == 720)
+        self.assertEqual(sizes["720p"], small["filesize"] + audio["filesize"])
+        self.assertGreater(sizes["1080p"], sizes["720p"])
+
+    def test_audio_preset_uses_audio_only(self):
+        formats = self._formats()
+        audio = next(f for f in formats if f["vcodec"] == "none")
+        self.assertEqual(preset_sizes(formats)["audio"], audio["filesize"])
+
+    def test_missing_component_means_unknown(self):
+        only_video = [format_entry(raw_info()["formats"][0])]
+        sizes = preset_sizes(only_video)
+        self.assertEqual(sizes["1080p"], 0, "没有音频件时不能只报视频大小")
+        self.assertEqual(sizes["audio"], 0)
+
+    def test_empty_input_is_safe(self):
+        self.assertEqual(preset_sizes([]),
+                         {"best": 0, "1080p": 0, "720p": 0, "480p": 0,
+                          "audio": 0})
+        for item in preset_choices([]):
+            self.assertEqual(item["size_bytes"], 0)
+
+    def test_bitrate_fallback_uses_duration(self):
+        entry = {"format_id": "140", "vcodec": "none", "acodec": "mp4a",
+                 "abr": 128.0}
+        sized = preset_sizes([format_entry(entry)], duration=100.0)
+        self.assertEqual(sized["audio"], int(128.0 * 1000 / 8 * 100.0))
 
 
 class FormatsApiBase(unittest.TestCase):
@@ -249,7 +302,7 @@ class FormatsApiBase(unittest.TestCase):
         restore_engine(self._old_factory)
         srv.bootstrap(":memory:")
 
-    def json_get(self, path):
+    def json_get(self, path) -> Tuple[int, Any]:
         code, raw = raw_get(self.port, path)
         try:
             return code, json.loads(raw)
@@ -264,7 +317,57 @@ class FormatsApiBase(unittest.TestCase):
 
 
 class TestFormatsApi(FormatsApiBase):
-    """T809: the `/formats` contract."""
+    """T809: the `/formats` contract (+ T1306-T1308 sizes, Stage-013)."""
+
+    def test_formats_payload_carries_preset_sizes(self):
+        """T1306: the dropdown reads `presets[].size_bytes`."""
+        code, data = self.json_get(self.formats_url())
+        self.assertEqual(code, 200, data)
+        by_name = {item["name"]: item for item in data["presets"]}
+        self.assertEqual(by_name["audio"]["size_bytes"], 3200000)
+        self.assertEqual(by_name["1080p"]["size_bytes"], 1234567 + 3200000)
+        self.assertEqual(by_name["720p"]["size_bytes"], 700000 + 3200000)
+        self.assertGreater(by_name["1080p"]["size_bytes"],
+                           by_name["720p"]["size_bytes"])
+        for item in data["presets"]:
+            self.assertIsInstance(item["size_bytes"], int, item["name"])
+
+    def test_tasks_carry_live_size_bytes(self):
+        """T1307: while downloading the row shows yt-dlp's total size."""
+        factory = install_factory(lambda: CancelableEngine(hold_seconds=8.0))
+        try:
+            code, created = self.json_get(self.url())
+            self.assertEqual(code, 200, created)
+            task_id = created["task_id"]
+            control = None
+            deadline = time.monotonic() + 5
+            while control is None and time.monotonic() < deadline:
+                control = srv.scheduler.control_for(task_id)
+                if control is None:
+                    time.sleep(0.02)
+            if control is None:
+                self.fail("running task must expose a control")
+            control.total_size = 4242
+            code, data = self.json_get("/tasks")
+            self.assertEqual(code, 200, data)
+            item = next(t for t in data["tasks"] if t["task_id"] == task_id)
+            self.assertEqual(item["status"], "downloading")
+            self.assertEqual(item["size_bytes"], 4242)
+        finally:
+            restore_engine(factory)
+
+    def test_completed_size_uses_the_file_on_disk(self):
+        """T1308: finished rows report the real file size (0 when no file)."""
+        from core_files import task_file_size
+        code, created = self.json_get(self.url())
+        self.assertEqual(code, 200, created)
+        self.assertTrue(srv.scheduler.wait_idle(10))
+        code, data = self.json_get("/tasks")
+        item = next(t for t in data["tasks"]
+                    if t["task_id"] == created["task_id"])
+        self.assertEqual(item["status"], "completed")
+        self.assertEqual(item["size_bytes"],
+                         task_file_size(srv.DOWNLOAD_DIR, item["url"]))
 
     def test_formats_payload_shape(self):
         code, data = self.json_get(self.formats_url())

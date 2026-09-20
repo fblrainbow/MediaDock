@@ -4,11 +4,12 @@ import tempfile
 import threading
 import time
 import unittest
+from typing import cast
 
 from core_control import TaskControl
 from core_engine import DownloadEngine, FORMAT_EXPR, build_command
 from core_manager import TaskManager
-from core_parse import parse_line
+from core_parse import parse_line, parse_size
 
 
 class FakeProcess:
@@ -62,7 +63,9 @@ class TestParser(unittest.TestCase):
     def test_progress(self):
         e = parse_line("[download]  8.8% of ~ 50.00MiB at 22.68KiB/s ETA 47:53")
         self.assertEqual(e.kind, "progress")
-        self.assertAlmostEqual(e.percent, 8.8)
+        percent = e.percent
+        self.assertIsNotNone(percent)
+        self.assertAlmostEqual(float(percent or 0.0), 8.8)
 
     def test_merging(self):
         e = parse_line("[Merger] Merging formats into \"o.mp4\"")
@@ -90,6 +93,31 @@ class TestParser(unittest.TestCase):
         e = parse_line("[ExtractAudio] Destination: downloads\\song [abc].mp3")
         self.assertEqual(e.kind, "merged")
         self.assertTrue(e.path.endswith("song [abc].mp3"), e.path)
+
+    def test_progress_line_records_total_size(self):
+        """Stage-013: the `of ~ 50.00MiB` token drives the row's size."""
+        e = parse_line("[download]  8.8% of ~ 50.00MiB at 22.68KiB/s ETA 47:53")
+        self.assertEqual(e.size, "50.00MiB")
+        # 现有分组契约不变（test_baseline 依赖 group(2) 是速度）
+        e2 = parse_line("[download]   1.4% of ~ 368.62MiB at 1.55MiB/s "
+                        "ETA 01:31 (frag 4/364)")
+        self.assertEqual(e2.size, "368.62MiB")
+        self.assertEqual(e2.speed, "1.55MiB/s")
+
+    def test_progress_line_without_size(self):
+        e = parse_line("[download] 100% of 1MiB at 1MiB/s ETA 00:00")
+        self.assertEqual(e.kind, "progress")
+        self.assertIn(e.size, ("", "1MiB"))
+
+    def test_parse_size_units(self):
+        self.assertEqual(parse_size("1MiB"), 1024 * 1024)
+        self.assertEqual(parse_size("1.5MiB"), int(1.5 * 1024 * 1024))
+        self.assertEqual(parse_size("2KiB"), 2048)
+        self.assertEqual(parse_size("1MB"), 1000 * 1000)
+        self.assertEqual(parse_size("1.5GiB"), int(1.5 * 1024 ** 3))
+        self.assertEqual(parse_size("500B"), 500)
+        for bad in ("", "abc", "12", "MiB"):
+            self.assertEqual(parse_size(bad), 0, bad)
 
     def test_title(self):
         e = parse_line("[info] Some Video: Downloading video")
@@ -123,10 +151,22 @@ class TestCommand(unittest.TestCase):
         self.assertEqual(cmd[cmd.index("--ffmpeg-location") + 1], "FF")
 
     def test_empty_audio_format_keeps_the_frozen_policy(self):
-        for value in ("", "   ", None):
+        for value in ("", "   "):
             cmd = build_command("YT", "DIR", "URL", "", FORMAT_EXPR, value)
             self.assertIn("--merge-output-format", cmd, repr(value))
             self.assertNotIn("--extract-audio", cmd, repr(value))
+        # None（字段没设过）也走默认策略
+        cmd = build_command("YT", "DIR", "URL", "", FORMAT_EXPR,
+                            cast(str, None))
+        self.assertIn("--merge-output-format", cmd)
+        self.assertNotIn("--extract-audio", cmd)
+
+
+def get_task(manager, task_id):
+    """`manager.get()` narrowed for tests: fail loudly instead of a bare None."""
+    task = manager.get(task_id)
+    assert task is not None, f"task {task_id} disappeared"
+    return task
 
 
 class TestEngine(unittest.TestCase):
@@ -145,20 +185,20 @@ class TestEngine(unittest.TestCase):
                  '[Merger] Merging formats into "o.mp4"']
         m, tid, res = self._run(lines, 0)
         self.assertEqual(res.returncode, 0)
-        self.assertEqual(m.get(tid).status, "completed")
-        self.assertEqual(m.get(tid).percent, 100.0)
+        self.assertEqual(get_task(m, tid).status, "completed")
+        self.assertEqual(get_task(m, tid).percent, 100.0)
 
     def test_failure(self):
         m, tid, res = self._run(["some output"], 1)
-        self.assertEqual(m.get(tid).status, "error")
-        self.assertEqual(m.get(tid).error_code, "exit_code")
+        self.assertEqual(get_task(m, tid).status, "error")
+        self.assertEqual(get_task(m, tid).error_code, "exit_code")
 
     def test_missing_binary(self):
         def boom(*a, **k):
             raise FileNotFoundError("nope")
         m, tid, res = self._run([], factory=boom)
-        self.assertEqual(m.get(tid).status, "error")
-        self.assertEqual(m.get(tid).error_code, "ytdlp_missing")
+        self.assertEqual(get_task(m, tid).status, "error")
+        self.assertEqual(get_task(m, tid).error_code, "ytdlp_missing")
 
 
 def wait_status(manager, task_id, status, timeout=5.0):
@@ -209,7 +249,7 @@ class TestEngineControl(unittest.TestCase):
         thread, outcome = self._run_with_control(engine, task, control)
         self.assertTrue(control.request_pause())
         thread.join(10)
-        stored = m.get(task.task_id)
+        stored = get_task(m, task.task_id)
         self.assertEqual(stored.status, "paused")
         self.assertEqual(stored.error_code, "")
         self.assertEqual(stored.error_message, "")
@@ -218,7 +258,7 @@ class TestEngineControl(unittest.TestCase):
         self.assertEqual(outcome["result"].error_code, "paused")
         # 幂等：重复暂停不产生第二次转换
         self.assertFalse(control.request_pause())
-        self.assertEqual(m.get(task.task_id).status, "paused")
+        self.assertEqual(get_task(m, task.task_id).status, "paused")
 
     def test_cancel_marks_cancelled_and_deletes_run_files(self):
         tmp = tempfile.mkdtemp(prefix="mediadock-engine-")
@@ -235,7 +275,7 @@ class TestEngineControl(unittest.TestCase):
         thread, outcome = self._run_with_control(engine, task, control)
         self.assertTrue(control.request_cancel())
         thread.join(10)
-        stored = m.get(task.task_id)
+        stored = get_task(m, task.task_id)
         self.assertEqual(stored.status, "cancelled")
         self.assertFalse(os.path.exists(target), "run output was not removed")
         self.assertFalse(os.path.exists(part), "temp file was not removed")

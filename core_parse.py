@@ -14,6 +14,13 @@ from typing import Optional
 PROGRESS_RE = re.compile(
     r"\[download\]\s+(\d+(?:\.\d+)?)%\s+of\s+.*?at\s+(.+?)\s+ETA\s+(.+)"
 )
+# Stage-013: yt-dlp prints the total size as `of ~ 50.00MiB`. Kept as its own
+# pattern so PROGRESS_RE's capture groups (asserted by tests) stay unchanged.
+SIZE_RE = re.compile(
+    r"\[download\]\s+\d+(?:\.\d+)?%\s+of\s+~?\s*([\d.]+\s*[KMGT]?i?B)",
+    re.IGNORECASE,
+)
+_SIZE_RE = re.compile(r"^\s*([\d.]+)\s*([KMGT]?)(i?)B\s*$", re.IGNORECASE)
 MERGE_RE = re.compile(r"\[Merger\]|Merging formats", re.IGNORECASE)
 TITLE_RE = re.compile(r"\[info\]\s+(.+?):\s+Downloading")
 DEST_RE = re.compile(r"\[download\]\s+Destination:\s*(.+?)\s*$")
@@ -31,6 +38,25 @@ class ProgressEvent:
     eta: str = ""
     title: str = ""
     path: str = ""
+    size: str = ""  # Stage-013: total size token, e.g. "50.00MiB"
+
+
+def parse_size(text: str) -> int:
+    """`"1.5MiB"` -> bytes; `0` when the token cannot be understood.
+
+    yt-dlp uses binary units (`MiB`); plain `MB` is treated as decimal.
+    """
+    match = _SIZE_RE.match(str(text or ""))
+    if not match:
+        return 0
+    try:
+        value = float(match.group(1))
+    except ValueError:
+        return 0
+    power = {"": 0, "K": 1, "M": 2, "G": 3, "T": 4}.get(
+        match.group(2).upper(), 0)
+    base = 1024 if match.group(3) else 1000
+    return int(value * (base ** power))
 
 
 def parse_line(line: str) -> ProgressEvent:
@@ -59,9 +85,11 @@ def parse_line(line: str) -> ProgressEvent:
             pct = float(m.group(1))
         except ValueError:
             return ProgressEvent(kind="ignored")
+        sized = SIZE_RE.search(text)
         return ProgressEvent(kind="progress", percent=pct,
                              speed=m.group(2).strip(),
-                             eta=m.group(3).strip())
+                             eta=m.group(3).strip(),
+                             size=sized.group(1).strip() if sized else "")
     if text.startswith("[info]"):
         t = TITLE_RE.search(text)
         if t:

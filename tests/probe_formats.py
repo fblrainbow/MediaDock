@@ -39,9 +39,10 @@ PAYLOAD = (
     '"vcodec":"avc1.640028","acodec":"none","filesize":1234567,'
     '"format_note":"1080p"},'
     '{"format_id":"136","ext":"mp4","height":720,"width":1280,"fps":30,'
-    '"vcodec":"avc1.4d401f","acodec":"none","format_note":"720p"},'
+    '"vcodec":"avc1.4d401f","acodec":"none","filesize_approx":700000,'
+    '"format_note":"720p"},'
     '{"format_id":"140","ext":"m4a","vcodec":"none","acodec":"mp4a.40.2",'
-    '"abr":128.0,"format_note":"medium"}]}'
+    '"abr":128.0,"filesize":3200000,"format_note":"medium"}]}'
 )
 
 URL = "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
@@ -209,6 +210,24 @@ def main():
         checks["probe_argv_no_shell_chars"] = not any(
             token in ("|", "&", ">", "<") for token in argv)
 
+        # 4b) 预设大小 (Stage-013)：下拉框直接用 presets[].size_bytes
+        if payload is not None:
+            presets = payload.get("presets") or []
+            by_name = {item.get("name"): item for item in presets}
+            checks["preset_sizes_all_int"] = bool(presets) and all(
+                isinstance(item.get("size_bytes"), int) for item in presets)
+            checks["preset_size_audio"] = \
+                by_name.get("audio", {}).get("size_bytes") == 3200000
+            checks["preset_size_1080p"] = \
+                by_name.get("1080p", {}).get("size_bytes") == 1234567 + 3200000
+            checks["preset_size_ordered"] = (
+                by_name.get("1080p", {}).get("size_bytes", 0)
+                > by_name.get("720p", {}).get("size_bytes", 0) > 0)
+            # 夹具里没有 <=480p 的格式：估算未知就报 0（前端不显示），
+            # 绝不用 1080p 的大小冒充 480p
+            checks["preset_size_480p_unknown"] = \
+                by_name.get("480p", {}).get("size_bytes") == 0
+
         # 5) 显式 format_id：必须来自 /formats，且能真正到达 argv
         code, raw = request(port, "/download?url=" + quote_url(URL)
                             + "&format_id=137")
@@ -294,6 +313,19 @@ def main():
         checks["default_download_200"] = code == 200 and bool(third_id)
         checks["default_expression"] = bool(third_id) and \
             srv.scheduler.format_for(third_id) == FORMAT_EXPR
+
+        # 9) 任务列表带大小字段 (Stage-013)：形状稳定且为整数
+        deadline = time.monotonic() + 20
+        while srv.scheduler.active_count() and time.monotonic() < deadline:
+            time.sleep(0.02)
+        code, raw = request(port, "/tasks")
+        tasks = (as_json(raw) or {}).get("tasks") or []
+        checks["tasks_have_size_bytes"] = code == 200 and bool(tasks) and all(
+            isinstance(task.get("size_bytes"), int) for task in tasks)
+        code, raw = request(port, "/history?limit=50")
+        history = (as_json(raw) or {}).get("tasks") or []
+        checks["history_has_size_bytes"] = code == 200 and all(
+            isinstance(task.get("size_bytes"), int) for task in history)
 
         failed = [name for name, ok in checks.items() if not ok]
         result = {

@@ -85,8 +85,92 @@ def preset_names() -> List[str]:
     return [p.name for p in PRESETS]
 
 
-def presets_public() -> List[Dict[str, Any]]:
-    return [p.to_dict() for p in PRESETS]
+def _approx_bytes(entry: Dict[str, Any], duration: float = 0.0) -> int:
+    """Best available size for one format: `filesize` else bitrate x duration."""
+    size = _to_int(entry.get("filesize"))
+    if size:
+        return size
+    tbr = _to_float(entry.get("tbr")) or _to_float(entry.get("abr"))
+    if tbr and duration > 0:
+        return int(tbr * 1000 / 8 * duration)
+    return 0
+
+
+def _best_video(formats: Sequence[Dict[str, Any]], max_height: int,
+                duration: float = 0.0) -> Optional[Dict[str, Any]]:
+    best: Optional[tuple] = None
+    for entry in formats:
+        if str(entry.get("vcodec") or "none").lower() == "none":
+            continue
+        height = _to_int(entry.get("height")) or 0
+        if max_height and (not height or height > max_height):
+            continue
+        size = _approx_bytes(entry, duration)
+        if not size:
+            continue
+        rank = (height, _to_float(entry.get("fps")) or 0.0)
+        if best is None or rank > best[0]:
+            best = (rank, entry, size)
+    return None if best is None else {"entry": best[1], "size": best[2]}
+
+
+def _best_audio(formats: Sequence[Dict[str, Any]],
+                duration: float = 0.0) -> Optional[Dict[str, Any]]:
+    best: Optional[tuple] = None
+    for entry in formats:
+        if str(entry.get("acodec") or "none").lower() == "none":
+            continue
+        if str(entry.get("vcodec") or "none").lower() != "none":
+            continue
+        size = _approx_bytes(entry, duration)
+        if not size:
+            continue
+        rank = _to_float(entry.get("abr")) or 0.0
+        if best is None or rank > best[0]:
+            best = (rank, entry, size)
+    return None if best is None else {"entry": best[1], "size": best[2]}
+
+
+def preset_sizes(formats: Sequence[Dict[str, Any]],
+                 duration: float = 0.0) -> Dict[str, int]:
+    """Estimated bytes per preset (`0` = unknown, so the UI shows nothing).
+
+    Stage-013: video presets = best video within the height ceiling plus the
+    best audio-only format (`bv*+ba`, which is what the selectors merge); the
+    `audio` preset = best audio-only format. A missing component means the
+    estimate is unknown rather than understated.
+    """
+    audio = _best_audio(formats, duration)
+    audio_size = audio["size"] if audio else 0
+    sizes: Dict[str, int] = {"audio": audio_size}
+    for preset in PRESETS:
+        if preset.kind != "video":
+            continue
+        video = _best_video(formats, preset.max_height, duration)
+        if video is None or not audio_size:
+            sizes[preset.name] = 0
+            continue
+        sizes[preset.name] = int(video["size"]) + int(audio_size)
+    return sizes
+
+
+def preset_choices(formats: Sequence[Dict[str, Any]] = (),
+                   duration: float = 0.0) -> List[Dict[str, Any]]:
+    """Public preset table; `size_bytes` is 0 when it cannot be estimated."""
+    entries = list(formats or ())
+    sizes = preset_sizes(entries, duration) if entries else {}
+    items = []
+    for preset in PRESETS:
+        item = preset.to_dict()
+        item["size_bytes"] = int(sizes.get(preset.name, 0))
+        items.append(item)
+    return items
+
+
+def presets_public(formats: Sequence[Dict[str, Any]] = (),
+                   duration: float = 0.0) -> List[Dict[str, Any]]:
+    """Backwards-compatible alias kept for existing callers/tests."""
+    return preset_choices(formats, duration)
 
 
 def resolve_preset(value: Any) -> Tuple[Optional[Preset], str, str]:
@@ -289,7 +373,7 @@ def build_formats_payload(info: Dict[str, Any], url: str, platform: str,
         "extractor": str(info.get("extractor_key") or info.get("extractor")
                          or "")[:80],
         "default_preset": DEFAULT_PRESET,
-        "presets": presets_public(),
+        "presets": preset_choices(entries, _to_float(info.get("duration")) or 0.0),
         "formats": entries,
         "count": len(entries),
         "total": total,

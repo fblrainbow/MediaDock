@@ -104,6 +104,9 @@ class TaskControl:
         self.task_id = task_id
         self.format_expr = ""
         self.audio_format = ""
+        # Stage-013: total size reported by the running download (`0` = unknown).
+        # Transient on purpose: it describes one run, not the stored Task.
+        self.total_size = 0
         self.media_job: Dict[str, Any] = {}
         self._lock = threading.RLock()
         self._pause = False

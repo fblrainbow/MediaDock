@@ -17,6 +17,10 @@ from typing import Any, Callable, Iterable, List, Optional, Set
 # yt-dlp leaves these behind while a download is incomplete.
 TEMP_SUFFIXES = (".part", ".ytdl", ".temp")
 
+# Stage-013: used to pick the deliverable that matches the task type.
+VIDEO_SUFFIXES = (".mp4", ".mkv", ".webm", ".mov", ".avi", ".flv")
+AUDIO_SUFFIXES = (".mp3", ".m4a", ".wav", ".aac", ".opus", ".ogg", ".flac")
+
 # yt-dlp default output template is "<title> [<id>].<ext>", so every file
 # belonging to one video carries its id in brackets.
 _ID_BRACKET = "[{vid}]"
@@ -124,6 +128,38 @@ def discover_task_files(download_dir: str, url: str,
         seen.add(key)
         found.append(real)
     return found
+
+
+def task_file_size(download_dir: str, url: str, prefer: str = "") -> int:
+    """Bytes of the delivered file for this video (`0` when unknown).
+
+    Stage-013: only non-temp files inside `download_dir` whose name carries the
+    video id marker are considered.
+
+    `prefer` is `"video"` (download tasks) or `"audio"` (media tasks): when the
+    same video has both kinds of deliverable, the one matching the task type is
+    used. Without a match (or without `prefer`) the largest file wins.
+    """
+    vid = video_id_from_url(url)
+    if not vid:
+        return 0
+    marker = _ID_BRACKET.format(vid=vid)
+    suffixes = {"video": VIDEO_SUFFIXES, "audio": AUDIO_SUFFIXES}.get(prefer, ())
+    best = 0
+    best_matched = 0
+    for path in _list_dir(download_dir):
+        if marker not in os.path.basename(path) or is_temp_file(path):
+            continue
+        if not is_inside(download_dir, path):
+            continue
+        try:
+            size = int(os.path.getsize(path))
+        except OSError:
+            continue
+        best = max(best, size)
+        if suffixes and os.path.splitext(path)[1].lower() in suffixes:
+            best_matched = max(best_matched, size)
+    return best_matched or best
 
 
 def cleanup_task_files(download_dir: str, url: str,

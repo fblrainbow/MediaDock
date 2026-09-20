@@ -3,9 +3,11 @@ import os
 import tempfile
 import time
 import unittest
+from typing import cast
 
 from core_files import (cleanup_task_files, discover_task_files, is_inside,
-                        is_temp_file, started_epoch, video_id_from_url)
+                        is_temp_file, started_epoch, task_file_size,
+                        video_id_from_url)
 
 URL = "https://www.youtube.com/watch?v=abcdefghijk"
 VID = "abcdefghijk"
@@ -28,15 +30,67 @@ class TestVideoId(unittest.TestCase):
             video_id_from_url("https://www.youtube.com/watch?list=1&v=abcdefghijk"),
             VID)
 
+
+class TestTaskFileSize(unittest.TestCase):
+    """Stage-013: the delivered file size shown by the task list."""
+
+    def test_size_of_delivered_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            make_file(tmp, "clip [%s].mp4" % VID, "x" * 1234)
+            self.assertEqual(task_file_size(tmp, URL), 1234)
+
+    def test_temp_files_are_ignored(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            make_file(tmp, "clip [%s].mp4.part" % VID, "x" * 999)
+            self.assertEqual(task_file_size(tmp, URL), 0)
+
+    def test_largest_file_wins(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            make_file(tmp, "clip [%s].webm" % VID, "x" * 500)
+            make_file(tmp, "clip [%s].mp3" % VID, "x" * 900)
+            self.assertEqual(task_file_size(tmp, URL), 900)
+
+    def test_prefer_picks_the_matching_deliverable(self):
+        """Stage-013: a download task must not borrow the extracted mp3 size."""
+        with tempfile.TemporaryDirectory() as tmp:
+            make_file(tmp, "clip [%s].webm" % VID, "x" * 500)
+            make_file(tmp, "clip [%s].mp3" % VID, "x" * 900)
+            self.assertEqual(task_file_size(tmp, URL, "video"), 500)
+            self.assertEqual(task_file_size(tmp, URL, "audio"), 900)
+
+    def test_prefer_falls_back_when_that_kind_is_absent(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            make_file(tmp, "clip [%s].webm" % VID, "x" * 500)
+            self.assertEqual(task_file_size(tmp, URL, "audio"), 500)
+            self.assertEqual(task_file_size(tmp, URL, "video"), 500)
+
+    def test_prefer_ignores_unknown_kinds(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            make_file(tmp, "clip [%s].webm" % VID, "x" * 500)
+            self.assertEqual(task_file_size(tmp, URL, "nonsense"), 500)
+
+    def test_other_videos_and_unknown_ids(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            make_file(tmp, "other [zzzzzzzzzzz].mp4", "x" * 77)
+            self.assertEqual(task_file_size(tmp, URL), 0)
+            self.assertEqual(task_file_size(tmp, "https://example.com/x"), 0)
+
+    def test_missing_directory_is_safe(self):
+        self.assertEqual(task_file_size("Z:\\nope-not-here", URL), 0)
+
     def test_shorts_and_youtu_be(self):
         self.assertEqual(
             video_id_from_url("https://www.youtube.com/shorts/abcdefghijk"), VID)
         self.assertEqual(video_id_from_url("https://youtu.be/abcdefghijk"), VID)
 
     def test_unknown_urls(self):
-        for url in ("", None, "https://example.com/v", "not a url",
+        for url in ("", "https://example.com/v", "not a url",
                     "https://www.youtube.com/watch?v=short"):
             self.assertEqual(video_id_from_url(url), "")
+
+    def test_none_is_tolerated(self):
+        # 运行期容忍 None（调用方可能传空），类型上显式声明
+        self.assertEqual(video_id_from_url(cast(str, None)), "")
 
 
 class TestPathBoundary(unittest.TestCase):

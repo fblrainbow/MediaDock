@@ -83,6 +83,21 @@
         if (!isFinite(n)) return '0.0';
         return n.toFixed(1);
     }
+    // 文件大小 (Stage-013)：服务端只给字节数，展示格式全在前端
+    function formatSize(bytes) {
+        const n = Number(bytes);
+        if (!isFinite(n) || n <= 0) return '';
+        const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        let value = n;
+        let index = 0;
+        while (value >= 1024 && index < units.length - 1) {
+            value = value / 1024;
+            index += 1;
+        }
+        const text = index === 0 ? String(Math.round(value))
+            : value.toFixed(value >= 100 ? 0 : 1);
+        return text + ' ' + units[index];
+    }
     // =========================
     // 下载按钮 (SPA 保活：YouTube 切视频页面不刷新)
     // =========================
@@ -199,6 +214,54 @@
     function narrowScreen() {
         return window.innerWidth < 620;
     }
+    // =========================
+    // 清晰度大小 (Stage-013)：/formats 给出每个预设的估算字节数，
+    // 前端只负责显示（服务端算，不信任前端算术）
+    // =========================
+    let sizesUrl = '';
+    let presetSizes = {};
+    function baseLabelFor(name) {
+        for (let i = 0; i < PRESET_OPTIONS.length; i++) {
+            if (PRESET_OPTIONS[i].name === name) return PRESET_OPTIONS[i].label;
+        }
+        return String(name || '');
+    }
+    function applyPresetSizes(payload) {
+        if (!presetSelect || !payload || !Array.isArray(payload.presets)) return;
+        presetSizes = {};
+        payload.presets.forEach(function (item) {
+            if (item && item.name) {
+                presetSizes[item.name] = Number(item.size_bytes) || 0;
+            }
+        });
+        for (let i = 0; i < presetSelect.options.length; i++) {
+            const option = presetSelect.options[i];
+            const base = baseLabelFor(option.value);
+            const text = formatSize(presetSizes[option.value]);
+            option.textContent = text ? base + ' · ≈' + text : base;
+        }
+    }
+    function refreshPresetSizes() {
+        const url = cleanYouTubeUrl(location.href);
+        if (!url || url === sizesUrl) return;
+        GM_xmlhttpRequest({
+            method: 'GET',
+            url: SERVER + '/formats?url=' + encodeURIComponent(url),
+            timeout: 60000,
+            onload: function (response) {
+                if (response.status !== 200) return;
+                try {
+                    sizesUrl = url;
+                    applyPresetSizes(JSON.parse(response.responseText));
+                } catch (error) {
+                    console.warn('[MediaDock] 解析 /formats 失败:', error);
+                }
+            },
+            onerror: function () {
+                console.warn('[MediaDock] /formats 不可用，清晰度暂不显示大小');
+            }
+        });
+    }
     function ensurePanel() {
         if (panel && document.body.contains(panel)) return panel;
         panel = document.createElement('div');
@@ -262,18 +325,22 @@
     // 状态文案 + 行内控制按钮 (Stage-004)：按钮只由服务端状态决定
     function rowTextFor(task) {
         const title = shortTitle(task.title || task.url || '');
+        const size = formatSize(task.size_bytes);
         if (task.status === 'downloading') {
             // FFmpeg 阶段：合并（视频）或提取音频（仅音频预设）
             if (task.speed === 'merging') return '🔄 ' + title + ' · 处理中';
             let text = '⏳ ' + title + ' · ' + pct(task.percent) + '%';
+            if (size) text += ' · ' + size;
             if (task.speed) text += ' · ' + task.speed;
             if (task.eta) text += ' · ETA ' + task.eta;
             return text;
         }
         if (task.status === 'pending') return '🕒 ' + title + ' · 排队中';
-        if (task.status === 'paused') return '⏸ ' + title + ' · 已暂停';
+        if (task.status === 'paused') return '⏸ ' + title + ' · 已暂停' +
+            (size ? ' · ' + size : '');
         if (task.status === 'cancelled') return '🚫 ' + title + ' · 已取消';
-        if (task.status === 'completed') return '✅ ' + title + ' · 完成';
+        if (task.status === 'completed') return '✅ ' + title + ' · 完成' +
+            (size ? ' · ' + size : '');
         if (task.status === 'error') {
             const code = task.error_code
                 ? ' (' + (ERROR_HINTS[task.error_code] || task.error_code) + ')'
@@ -622,11 +689,14 @@
     ensureButton();
     ensurePanel();
     startPolling();
+    refreshPresetSizes();
     document.addEventListener('yt-navigate-finish', function () {
         // SPA 导航不清空共享列表，只确保按钮/面板仍挂在 DOM 上
         ensureButton();
         ensurePanel();
         if (!submitting) setButton('⬇ 下载 MP4', '#ff0000');
+        // 新视频页面：重新取一次清晰度大小（同 URL 不会重复请求）
+        refreshPresetSizes();
     });
     setInterval(function () {
         if (!button || !document.body.contains(button)) ensureButton();

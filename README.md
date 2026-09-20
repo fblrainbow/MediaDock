@@ -1,6 +1,6 @@
 # MediaDock
 
-> 版本 **1.0.2**（用户脚本 `5.2`）｜本地媒体下载与处理平台｜Windows + Python 3.13 + 标准库
+> 版本 **1.0.3**（用户脚本 `5.2`）｜本地媒体下载与处理平台｜Windows + Python 3.13 + 标准库
 >
 > MediaDock 在 YouTube 页面放一个下载按钮，把下载任务交给本机 Python 服务：
 > yt-dlp 下载、FFmpeg 合并/转音频、SQLite 记录历史，所有页面共享同一份任务列表。
@@ -35,6 +35,7 @@ flowchart LR
 | 转音频 | 「仅音频」直接产出 MP3；已完成的视频也可用 `/audio` 转 MP3/M4A/WAV | Stage-009、Stage-012 |
 | 发布与回归 | 一条命令给出发布结论 + 文档 + 回滚路径 | Stage-010 |
 | 单实例接管 | 启动时若端口被旧 MediaDock 实例占用，自动结束旧实例再启动 | Stage-011 |
+| 文件大小 | 任务行显示实时总大小/成品大小，清晰度下拉显示每个预设的估算大小 | Stage-013 |
 
 ---
 
@@ -152,7 +153,7 @@ core_store.py      SQLite 存储、迁移、事件、清理
 core_task.py       Task 数据结构
 MediaDock.js       Tampermonkey 用户脚本
 docs/              安装、配置、脚本、变更日志、限制、升级回滚、发布清单
-tests/             361 个单元测试 + 9 个探针 + JS 结构检查 + 发布检查
+tests/             378 个单元测试 + 9 个探针 + JS 结构检查 + 发布检查
 ```
 
 ---

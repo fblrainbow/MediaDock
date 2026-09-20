@@ -12,6 +12,7 @@ from core_config import (Config, config_public, load_config)
 from core_control import ControlError
 from core_deps import failed_checks, run_checks
 from core_engine import DownloadEngine, resolve_ffmpeg
+from core_files import task_file_size
 from core_formats import (DEFAULT_PRESET, ERROR_FORMAT_NOT_AVAILABLE,
                           ERROR_INVALID_FORMAT, FormatsProbe, audio_format_for,
                           format_id_present, preset_satisfied, resolve_preset,
@@ -385,7 +386,42 @@ def audio_action(source_task_id, target_raw, source_raw=""):
             "target": target.name, "source": path}, 200
 
 
+def task_size_bytes(task):
+    """Bytes for one task row (Stage-013).
+
+    `downloading` -> the run's total size reported by yt-dlp;
+    `completed`   -> the real file size on disk;
+    anything else -> `0` ("unknown", the panel then shows nothing).
+    This is an additive API field: no Task field and no schema change.
+    """
+    status = str(task.get("status") or "")
+    task_id = str(task.get("task_id") or "")
+    if status == "downloading":
+        control = scheduler.control_for(task_id)
+        return int(getattr(control, "total_size", 0) or 0)
+    if status == "completed":
+        prefer = "audio" if str(task.get("type") or "") == "audio" else "video"
+        return task_file_size(DOWNLOAD_DIR, str(task.get("url") or ""), prefer)
+    return 0
+
+
+def attach_sizes(tasks):
+    """Add `size_bytes` to every task dict of a listing payload."""
+    for item in tasks or ():
+        if isinstance(item, dict):
+            item["size_bytes"] = task_size_bytes(item)
+    return tasks
+
+
 def storage_info():
+    """Payload for /health and /tasks (Stage-005.md 5.4)."""
+    if storage is None:
+        return {"kind": "memory", "db": DB_PATH, "schema_version": 0,
+                "degraded": bool(storage_reason), "reason": storage_reason}
+    info = storage.info()
+    if storage_reason:
+        info["reason"] = info.get("reason") or storage_reason
+    return info
     """Payload for /health and /tasks (Stage-005.md 5.4)."""
     if storage is None:
         return {"kind": "memory", "db": DB_PATH, "schema_version": 0,
@@ -625,6 +661,7 @@ class Handler(BaseHTTPRequestHandler):
         # 共享任务列表：全量任务（契约排序）+ 调度器计数 (Stage-003)
         if parsed.path == "/tasks":
             payload = build_task_list(manager, scheduler)
+            attach_sizes(payload.get("tasks"))
             payload["storage"] = storage_info()
             self._json(payload)
             return
@@ -645,8 +682,10 @@ class Handler(BaseHTTPRequestHandler):
                     "status must be one of " + ", ".join(HISTORY_STATUSES), 400)
                 self._json(body, code=code)
                 return
-            self._json(build_history(manager, limit=limit, status=status,
-                                     storage=storage_info()))
+            payload = build_history(manager, limit=limit, status=status,
+                                    storage=storage_info())
+            attach_sizes(payload.get("tasks"))
+            self._json(payload)
             return
         # 状态事件流 (Stage-005)：未知任务且无事件 -> 404
         if parsed.path == "/events":

@@ -17,7 +17,7 @@ from typing import Callable, List, Optional
 
 from core_control import TaskControl, terminate_tree
 from core_files import cleanup_task_files, started_epoch
-from core_parse import ProgressEvent, parse_line
+from core_parse import ProgressEvent, parse_line, parse_size
 
 FORMAT_EXPR = "bv*[height<=1080][ext=mp4]+ba[ext=m4a]/b[height<=1080][ext=mp4]"
 
@@ -245,6 +245,11 @@ class DownloadEngine:
     def _apply(self, task_id: str, event: ProgressEvent,
                control: TaskControl) -> None:
         if event.kind == "progress" and event.percent is not None:
+            # Stage-013: keep the run's total size so the task list can show it
+            if event.size:
+                total = parse_size(event.size)
+                if total:
+                    control.total_size = total
             self.manager.report_progress(task_id, event.percent,
                                          event.speed, event.eta)
         elif event.kind == "merging":

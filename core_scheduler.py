@@ -150,6 +150,14 @@ class Scheduler:
         with self._lock:
             return dict(self._jobs.get(task_id, {}))
 
+    def control_for(self, task_id: str):
+        """Live `TaskControl` for a running task, or `None` (Stage-013).
+
+        Read-only use: the task list asks for the run's total size. Nothing
+        here writes Task fields or persists anything.
+        """
+        return self._controls.get(task_id)
+
     def _start_locked(self, task_id: str) -> bool:
         if task_id in self._started or task_id in self._finished:
             self._log(f"Scheduler ignored duplicate start for {task_id}")

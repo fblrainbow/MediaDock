@@ -1,9 +1,9 @@
 {
-  "base": "http://127.0.0.1:64931",
+  "base": "http://127.0.0.1:50446",
   "bind": "127.0.0.1",
   "port_mode": "ephemeral",
-  "fake_ytdlp": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-j2bdugne\\yt-dlp-ok.bat",
-  "argv_file": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-j2bdugne\\argv.txt",
+  "fake_ytdlp": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-v19b_ft2\\yt-dlp-ok.bat",
+  "argv_file": "C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\mediadock-formats-v19b_ft2\\argv.txt",
   "probe_argv": [
     "--dump-single-json",
     "--skip-download",
@@ -89,6 +89,11 @@
     "probe_argv_url_last": true,
     "probe_argv_has_no_format": true,
     "probe_argv_no_shell_chars": true,
+    "preset_sizes_all_int": true,
+    "preset_size_audio": true,
+    "preset_size_1080p": true,
+    "preset_size_ordered": true,
+    "preset_size_480p_unknown": true,
     "format_id_from_probe_200": true,
     "format_id_expression": true,
     "download_argv_real": true,
@@ -111,7 +116,9 @@
     "probe_failure_502": true,
     "failure_not_cached": true,
     "default_download_200": true,
-    "default_expression": true
+    "default_expression": true,
+    "tasks_have_size_bytes": true,
+    "history_has_size_bytes": true
   },
   "failed_checks": []
 }
