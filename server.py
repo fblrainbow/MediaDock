@@ -5,6 +5,7 @@ import re
 import sys
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from typing import Any, cast
 from urllib.parse import urlparse, parse_qs
 
 from core_config import (Config, config_public, load_config)
@@ -39,7 +40,10 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 LEVEL_RANK = {"debug": 10, "info": 20, "warning": 30, "error": 40}
 
-CONFIG = None
+# 类型说明：下面这些全局量在模块导入末尾（apply_config + bootstrap）一定会被赋值，
+# 但初始值是 None。用 cast 声明真实类型，避免 Pylance 把它们推断为 None，
+# 从而在使用点误报 "xxx is not a known attribute of None"。
+CONFIG: Config = cast(Config, None)
 CONFIG_ERRORS = []
 HOST = "127.0.0.1"
 PORT = 8765
@@ -184,12 +188,12 @@ INTERRUPTED_MESSAGE = ("service restarted before the task finished; "
                        "it was not resumed automatically")
 RESTART_ERROR_STATUSES = ("downloading", "pending")
 
-manager = None
-scheduler = None
-storage = None
+manager: TaskManager = cast(TaskManager, None)
+scheduler: Scheduler = cast(Scheduler, None)
+storage: Any = None
 storage_reason = ""
 tasks = {}
-tasks_lock = None
+tasks_lock: Any = None
 DB_PATH = effective_db_path(None)
 
 # =========================
@@ -199,9 +203,6 @@ def _make_engine():
     """每次运行构造一个引擎；yt-dlp 路径延迟读取，便于测试/探针替换。"""
     return DownloadEngine(manager, ytdlp=YT_DLP, download_dir=DOWNLOAD_DIR,
                           logger=log, ffmpeg=FFMPEG)
-
-
-scheduler = None
 
 
 def _apply_restart_matrix(store, task_manager):
@@ -525,14 +526,18 @@ def _update(task_id, **fields):
     if t.status != "downloading":
         return
     if "title" in fields and len(fields) == 1:
-        manager.report_title(task_id, fields["title"])
+        updated = manager.report_title(task_id, fields["title"])
     elif "percent" in fields:
-        manager.report_progress(task_id, fields.get("percent", t.percent),
-                                fields.get("speed", t.speed),
-                                fields.get("eta", t.eta))
+        updated = manager.report_progress(task_id,
+                                          fields.get("percent", t.percent),
+                                          fields.get("speed", t.speed),
+                                          fields.get("eta", t.eta))
     elif set(fields) == {"speed"} and fields.get("speed") == "merging":
-        manager.report_merging(task_id)
-    _sync_legacy_view(task_id, manager.get(task_id).to_dict())
+        updated = manager.report_merging(task_id)
+    else:
+        updated = t
+    # report_* 返回更新后的 Task；返回 None 表示任务已消失，沿用本地快照
+    _sync_legacy_view(task_id, (updated if updated is not None else t).to_dict())
 
 
 def _sync_legacy_view(task_id, full):
@@ -567,9 +572,10 @@ def _error(code, message, http_code, task_id=None):
 
 
 class Handler(BaseHTTPRequestHandler):
-    def log_message(self, fmt, *args):
+    def log_message(self, format, *args):
         # 接管 http.server 默认日志，走统一 log()
-        log(f"HTTP {self.address_string()} {fmt % args}")
+        # 形参名必须与基类 BaseHTTPRequestHandler.log_message 一致
+        log(f"HTTP {self.address_string()} {format % args}")
 
     def _json(self, obj, code=200):
         body = json.dumps(obj, ensure_ascii=False).encode("utf-8")
@@ -627,6 +633,8 @@ class Handler(BaseHTTPRequestHandler):
                 body, code = _error("invalid_limit", err, 400)
                 self._json(body, code=code)
                 return
+            # 走到这里 err 必为 None，limit 一定是有效整数（仅用于让类型检查收窄）
+            limit = cast(int, limit)
             status = params.get("status", [None])[0]
             if status and status not in HISTORY_STATUSES:
                 body, code = _error(
@@ -657,6 +665,7 @@ class Handler(BaseHTTPRequestHandler):
                 body, code = _error("invalid_limit", err, 400)
                 self._json(body, code=code)
                 return
+            limit = cast(int, limit)
             events = storage.events(str(tid), limit) if storage is not None else []
             if not events and manager.get(str(tid)) is None:
                 body, code = _error("task_not_found", "task not found", 404, tid)
