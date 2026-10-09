@@ -19,6 +19,17 @@ flowchart LR
 
 ---
 
+## 演示
+
+完整流程演示（YouTube 页面按钮 → 任务创建 → 下载 → 完成）：[sample.mp4](sample.mp4)
+
+<video src="sample.720p.mp4" controls width="720"></video>
+
+> 视频约 94 MB。GitHub 出于安全策略不渲染 `<video>` 标签，点上面的链接下载观看；
+> VS Code 的 Markdown 预览（`Ctrl+Shift+V`）可直接播放。
+
+---
+
 ## 1. 能做什么
 
 | 能力 | 说明 | 引入阶段 |
@@ -152,6 +163,7 @@ core_security.py   Host/Origin/路径/日志脱敏纯函数
 core_store.py      SQLite 存储、迁移、事件、清理
 core_task.py       Task 数据结构
 MediaDock.js       Tampermonkey 用户脚本
+sample.mp4         演示视频（README「演示」章节引用）
 docs/              安装、配置、脚本、变更日志、限制、升级回滚、发布清单
 tests/             378 个单元测试 + 9 个探针 + JS 结构检查 + 发布检查
 ```
